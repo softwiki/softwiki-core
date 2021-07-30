@@ -1,8 +1,8 @@
-import { NoteModel, Note, Tag, TagModel, TagProperties, NoteProperties } from "Core/Models";
+import { NoteModel, Note, Tag, TagModel, TagProperties, NoteProperties } from "../Models";
 import DataProvider from "./DataProvider";
 
-import { WriteFile, ReadFile } from "Core"
-import { ProjectModel, ProjectProperties } from "Core/Models/Project";
+import { WriteFile, ReadFile } from "SoftWiki-Core"
+import { ProjectModel, ProjectProperties } from "../Models/Project";
 
 export interface ICollections
 {

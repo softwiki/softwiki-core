@@ -1,9 +1,9 @@
-import Queue from "Core/Queue";
-import { Note, NoteModel, NoteProperties, Tag, TagModel, TagProperties } from "Core/Models";
+import Queue from "../Queue";
+import { Note, NoteModel, NoteProperties, Tag, TagModel, TagProperties } from "../Models";
 import DataProvider from "./DataProvider"
 import JsonDataProvider from "./JsonDataProvider";
-import Event from "Core/Services/EventService";
-import { Project, ProjectModel, ProjectProperties } from "Core/Models/Project";
+import Event from "../Services/EventService";
+import { Project, ProjectModel, ProjectProperties } from "../Models/Project";
 
 export enum DataEvent
 {

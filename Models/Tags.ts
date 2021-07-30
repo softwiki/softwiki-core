@@ -1,4 +1,4 @@
-import DataApi from "Core/Data/DataApi";
+import DataApi from "../Data/DataApi";
 import { ObjectReference } from "./Notes";
 
 export interface TagProperties

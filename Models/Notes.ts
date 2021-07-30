@@ -1,5 +1,5 @@
 import { Tag } from "./Tags"
-import { DataApiClass } from "Core/Data/DataApi"
+import { DataApiClass } from "../Data/DataApi"
 import { Project } from "./Project"
 
 export interface ObjectReference

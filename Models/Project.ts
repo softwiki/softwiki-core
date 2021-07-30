@@ -1,4 +1,4 @@
-import DataApi from "Core/Data/DataApi";
+import DataApi from "../Data/DataApi";
 import { Note, ObjectReference } from "./Notes";
 
 export interface ProjectProperties

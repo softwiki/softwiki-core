@@ -1,4 +1,4 @@
-import { Note, Tag } from 'Core/Models';
+import { Note, Tag } from "../Models";
 import { DataApiClass } from './DataApi';
 import DataProvider from './DataProvider';
 import MockedDataProvider, {ICollections} from "./MockedDataProvider";

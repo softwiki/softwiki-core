@@ -1,5 +1,5 @@
-import { NoteModel, Tag, TagModel, TagProperties, NoteProperties } from "Core/Models";
-import { ProjectModel, ProjectProperties } from "Core/Models/Project";
+import { NoteModel, Tag, TagModel, TagProperties, NoteProperties } from "../Models";
+import { ProjectModel, ProjectProperties } from "../Models/Project";
 
 export default abstract class DataProvider
 {
