@@ -5,7 +5,7 @@ import MockedDataProvider, {ICollections} from "./MockedDataProvider";
 
 describe("Frequent cases", () => {
 
-	let mockedDataProvider: DataProvider = new MockedDataProvider({notes: [], tags: []})
+	let mockedDataProvider: DataProvider = new MockedDataProvider({notes: [], tags: [], projects: []})
 	let dataApi = new DataApiClass(mockedDataProvider)
 
 	describe("First note ever", () => {
@@ -18,7 +18,7 @@ describe("Frequent cases", () => {
 		});
 	
 		test('Add a note, but previous note list is still be empty', async () => {
-			await dataApi.CreateNote({title: "Note 1", content: "test", tags: []})
+			await dataApi.CreateNote({title: "Note 1", content: "test", tags: [], project: undefined})
 			expect(notes).toHaveLength(0)
 		});
 	
@@ -32,13 +32,13 @@ describe("Frequent cases", () => {
 		
 		test('Second note', async () => {
 			expect(dataApi.GetNotes()).toHaveLength(1)
-			await dataApi.CreateNote({title: "Note 2", content: "test", tags: []})
+			await dataApi.CreateNote({title: "Note 2", content: "test", tags: [], project: undefined})
 			expect(dataApi.GetNotes()).toHaveLength(2)
 		})
 
 		test('Third note', async () => {
 			expect(dataApi.GetNotes()).toHaveLength(2)
-			await dataApi.CreateNote({title: "Note 3", content: "test", tags: []})
+			await dataApi.CreateNote({title: "Note 3", content: "test", tags: [], project: undefined})
 			expect(dataApi.GetNotes()).toHaveLength(3)
 		})
 
@@ -155,15 +155,16 @@ describe("Tags", () => {
 
 	let fakeData: ICollections = {
 		notes: [
-			{title: "First note", content: "Amazing content", tags: [], id: "1", custom: null},
-			{title: "Second note", content: "Amazing content", tags: ["1"], id: "2", custom: null},
-			{title: "Third note", content: "Amazing content", tags: ["1", "2"], id: "3", custom: null}
+			{title: "First note", content: "Amazing content", tags: [], id: "1", project: undefined, custom: null},
+			{title: "Second note", content: "Amazing content", tags: ["1"], id: "2", project: undefined, custom: null},
+			{title: "Third note", content: "Amazing content", tags: ["1", "2"], id: "3", project: undefined, custom: null}
 		],
 		tags: [
 			{name: "First tag", color: {r: 20, g: 20, b: 20, a: 1}, id: "1", custom: null},
 			{name: "Second tag", color: {r: 20, g: 20, b: 20, a: 1}, id: "2", custom: null},
 			{name: "Third tag", color: {r: 20, g: 20, b: 20, a: 1}, id: "3", custom: null}
-		] 
+		],
+		projects: []
 	}
 
 	let dataApi: DataApiClass

@@ -1,4 +1,4 @@
-let versions = window.process.versions as any
+let versions = window !== undefined ? window.process.versions : process.versions as any
 let isNode: boolean = (versions.node !== undefined)
 let isElectron: boolean = (versions.electron !== undefined)
 
