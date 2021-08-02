@@ -1,38 +1,38 @@
-let versions = window !== undefined ? window.process.versions : process.versions as any
-let isNode: boolean = (versions.node !== undefined)
-let isElectron: boolean = (versions.electron !== undefined)
+const versions = window !== undefined ? window.process.versions : process.versions as any;
+const isNode: boolean = (versions.node !== undefined);
+const isElectron: boolean = (versions.electron !== undefined);
 
-export async function ReadFile(path: string) : Promise<string>
+export async function ReadFile(path: string): Promise<string>
 {
 	if (!isElectron && !isNode)
-		return ""
-	const fs = isElectron ? window.require("fs").promises : require("fs").promises
+		return "";
+	const fs = isElectron ? window.require("fs").promises : require("fs").promises;
 	try
 	{
-		const data = await fs.readFile(path, "utf8")
+		const data = await fs.readFile(path, "utf8");
 		return data;
 	}
 	catch (e)
 	{
-		console.log("An error occured when trying to read file: " + path)
-		console.log(e)
-		throw e
+		console.log("An error occured when trying to read file: " + path);
+		console.log(e);
+		throw e;
 	}
 }
 
-export async function WriteFile(path: string, content: string) : Promise<void>
+export async function WriteFile(path: string, content: string): Promise<void>
 {
 	if (!isElectron && !isNode)
-		return 
-	const fs = isElectron ? window.require("fs").promises : require("fs").promises
+		return ;
+	const fs = isElectron ? window.require("fs").promises : require("fs").promises;
 	try
 	{
-		await fs.writeFile(path, content)
+		await fs.writeFile(path, content);
 	}
 	catch (e)
 	{
-		console.log("An error occured when trying to write file: " + path)
-		console.log(e)
-		throw e
+		console.log("An error occured when trying to write file: " + path);
+		console.log(e);
+		throw e;
 	}
 }

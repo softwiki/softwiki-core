@@ -4,15 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "test-watch": "jest --watch"
+    "test": "eslint . && jest",
+    "test-watch": "eslint . && jest --watch"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^26.0.24",
+    "@typescript-eslint/eslint-plugin": "^4.28.5",
+    "@typescript-eslint/parser": "^4.28.5",
+    "eslint": "^7.32.0",
     "jest": "^27.0.6",
     "ts-jest": "^27.0.4",
     "typescript": "^4.3.5"
-  }
+  },
+  "eslintIgnore": ["jest.config.js"]
 }

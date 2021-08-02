@@ -1,2 +1,1 @@
-export * from "./Events"
-export * from "./Files"
+export * from "./Files";

@@ -1,4 +1,4 @@
-import DataApi from "../Data/DataApi";
+import DataApi from "../data/DataApi";
 import { Note, ObjectReference } from "./Notes";
 
 export interface ProjectProperties
@@ -18,46 +18,46 @@ export class Project
 	{
 		this.properties = {
 			name: properties.name
-		}
+		};
 
 		this.objectRef = {
 			id: properties.id,
 			custom: properties.custom
-		}
+		};
 	}
 
-	public SetName(name: string) : void
+	public SetName(name: string): void
 	{
 		this.properties.name = name;
-		DataApi.UpdateProject(this)
+		DataApi.UpdateProject(this);
 	}
 
-	public GetName() : string
+	public GetName(): string
 	{
-		return this.properties.name
+		return this.properties.name;
 	}
 
-	public NoteCount() : number // [TODO] Optimize or find another way
+	public NoteCount(): number // [TODO] Optimize or find another way
 	{
-		let count = 0
-		let notes = DataApi.GetNotes()
+		let count = 0;
+		const notes = DataApi.GetNotes();
 		notes.forEach((note: Note) => {
 			if (note.HasProject(this))
-				count++
-		})
-		return count
+				count++;
+		});
+		return count;
 	}
 
 
-	public _GetID() : string { return this.objectRef.id }
+	public _GetID(): string { return this.objectRef.id; }
 
-	public Delete() : void
+	public Delete(): void
 	{
-		DataApi.DeleteProject(this)
+		DataApi.DeleteProject(this);
 	}
 
-	public GetModel() : ProjectModel
+	public GetModel(): ProjectModel
 	{
-		return {...this.properties, ...this.objectRef}
+		return {...this.properties, ...this.objectRef};
 	}
 }

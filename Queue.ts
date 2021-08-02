@@ -4,23 +4,23 @@ export default class Queue
 
 	constructor()
 	{
-		this.queue = []
+		this.queue = [];
 	}
 
-	public Add(f: () => Promise<void>)
+	public Add(f: () => Promise<void>): void
 	{
-		this.queue.push(f)
+		this.queue.push(f);
 		if (this.queue.length === 1)
-			this.Next()
+			this.Next();
 	}
 
-	public async Next()
+	public async Next(): Promise<void>
 	{
 		if (this.queue.length === 0)
 			return ;
-		let f = this.queue[0]
-		await f()
-		this.queue.shift()
-		this.Next()
+		const f = this.queue[0];
+		await f();
+		this.queue.shift();
+		this.Next();
 	}
 }
