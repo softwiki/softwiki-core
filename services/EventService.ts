@@ -34,7 +34,8 @@ export class EventService
 	{
 		if (this.events[name] === undefined)
 			return;
-		this.events[name].forEach(eventInfo => {
+		this.events[name].forEach(eventInfo => 
+		{
 			eventInfo.handler(args);
 		});
 	}

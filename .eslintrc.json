@@ -38,6 +38,10 @@
         "@typescript-eslint/no-var-requires": "off",
         "@typescript-eslint/type-annotation-spacing": "error",
         "@typescript-eslint/space-infix-ops": "error",
-        "@typescript-eslint/no-empty-function": "off"
+        "@typescript-eslint/no-empty-function": "off",
+        "brace-style": ["error", "allman", {"allowSingleLine": true}],
+        "lines-between-class-members": ["error", "always", {"exceptAfterSingleLine": true}],
+        "padded-blocks": ["error", "never"],
+        "no-multiple-empty-lines": ["error", {"max": 1}]
     }
 }

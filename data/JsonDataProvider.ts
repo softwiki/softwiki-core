@@ -74,7 +74,6 @@ export default class JsonDataProvider extends DataProvider
 		}
 	}
 
-
 	public async UpdateNote(note: NoteModel): Promise<void>
 	{
 		const collection = this.GetCollection<NoteModel>(Collections.Notes);
@@ -91,7 +90,7 @@ export default class JsonDataProvider extends DataProvider
 	{
 		const collection = this.GetCollection<NoteModel>(Collections.Notes);
 		const index = this.GetIndexInCollectionByID(Collections.Notes, note.id);
-		const tagIndex = collection[index].tags.indexOf(tag._GetID());
+		const tagIndex = collection[index].tags.indexOf(tag.Id());
 
 		collection[index].tags.splice(tagIndex, 1);
 		await this.WriteDB();
@@ -102,7 +101,7 @@ export default class JsonDataProvider extends DataProvider
 		const collection = this.GetCollection<NoteModel>(Collections.Notes);
 		const index = this.GetIndexInCollectionByID(Collections.Notes, note.id);
 
-		collection[index].tags.push(tag._GetID());
+		collection[index].tags.push(tag.Id());
 		await this.WriteDB();
 	}
 
@@ -133,7 +132,6 @@ export default class JsonDataProvider extends DataProvider
 			return ;
 		}
 	}
-
 
 	public async UpdateTag(tag: TagModel): Promise<void>
 	{
@@ -177,7 +175,6 @@ export default class JsonDataProvider extends DataProvider
 			return ;
 		}
 	}
-
 
 	public async UpdateProject(project: ProjectModel): Promise<void>
 	{

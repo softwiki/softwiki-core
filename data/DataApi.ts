@@ -17,6 +17,7 @@ export class DataApiClass
 {
 	private cache: {notes: NoteModel[], tags: TagModel[], projects: ProjectModel[]}
 		= {notes: [], tags: [], projects: []}
+
 	private queue: Queue
 
 	constructor(private dataProvider: DataProvider)
@@ -36,8 +37,10 @@ export class DataApiClass
 
 	public CreateNote(properties: NoteProperties): Promise<void>
 	{
-		return new Promise((resolve, reject) => {
-			this.queue.Add(async () => { 
+		return new Promise((resolve, reject) => 
+		{
+			this.queue.Add(async () => 
+			{ 
 				const newlyCreatedNote = await this.dataProvider.CreateNote(properties);
 				this.cache.notes.push(newlyCreatedNote);
 				Event.Run(DataEvent.NotesUpdated);
@@ -77,7 +80,7 @@ export class DataApiClass
 		if (!noteModel)
 			return note; // [TODO] Handle error if note doesn't exist instead of returning the original note
 
-		const tagIndex = noteModel.tags.indexOf(tag._GetID());
+		const tagIndex = noteModel.tags.indexOf(tag.Id());
 		if (tagIndex !== -1)
 			noteModel.tags.splice(tagIndex, 1);
 
@@ -93,7 +96,7 @@ export class DataApiClass
 		if (!noteModel)
 			return note; // [TODO] Handle error if note doesn't exist instead of returning the original note
 
-		noteModel.tags.push(tag._GetID());
+		noteModel.tags.push(tag.Id());
 
 		Event.Run(DataEvent.NotesUpdated);
 		return new Note(noteModel, this);
@@ -103,7 +106,8 @@ export class DataApiClass
 
 	public async CreateTag(properties: TagProperties): Promise<void>
 	{
-		this.queue.Add(async () => { 
+		this.queue.Add(async () => 
+		{ 
 			const newlyCreatedTag = await this.dataProvider.CreateTag(properties);
 			this.cache.tags.push(newlyCreatedTag);
 			Event.Run(DataEvent.NotesUpdated);
@@ -139,7 +143,8 @@ export class DataApiClass
 
 	public async CreateProject(properties: ProjectProperties): Promise<void>
 	{
-		this.queue.Add(async () => {
+		this.queue.Add(async () => 
+		{
 			const newlyCreateProject = await this.dataProvider.CreateProject(properties);
 			this.cache.projects.push(newlyCreateProject);
 			Event.Run(DataEvent.ProjectsUpdated);
@@ -173,27 +178,27 @@ export class DataApiClass
 
 	private GetNoteModelIndexInCache(note: Note): number
 	{
-		return this.cache.notes.findIndex((noteModelCache: NoteModel) => noteModelCache.id === note._GetID());
+		return this.cache.notes.findIndex((noteModelCache: NoteModel) => noteModelCache.id === note.Id());
 	}
 
 	private GetNoteModelInCache(note: Note): NoteModel | undefined
 	{
-		return this.cache.notes.find((noteModelCache: NoteModel) => noteModelCache.id === note._GetID());
+		return this.cache.notes.find((noteModelCache: NoteModel) => noteModelCache.id === note.Id());
 	}
 
 	private GetTagModelIndexInCache(tag: Tag): number
 	{
-		return this.cache.tags.findIndex((tagModelCache: TagModel) => tagModelCache.id === tag._GetID());
+		return this.cache.tags.findIndex((tagModelCache: TagModel) => tagModelCache.id === tag.Id());
 	}
 
 	private GetTagModelInCache(tag: Tag): TagModel | undefined
 	{
-		return this.cache.tags.find((tagModelCache: TagModel) => tagModelCache.id === tag._GetID());
+		return this.cache.tags.find((tagModelCache: TagModel) => tagModelCache.id === tag.Id());
 	}
 
 	private GetProjectModelIndexInCache(project: Project): number
 	{
-		return this.cache.projects.findIndex((projectModelCache: ProjectModel) => projectModelCache.id === project._GetID());
+		return this.cache.projects.findIndex((projectModelCache: ProjectModel) => projectModelCache.id === project.Id());
 	}
 }
 

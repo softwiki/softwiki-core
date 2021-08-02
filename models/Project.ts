@@ -6,7 +6,6 @@ export interface ProjectProperties
 	name: string
 }
 
-
 export interface ProjectModel extends ProjectProperties, ObjectReference {}
 
 export class Project
@@ -41,15 +40,18 @@ export class Project
 	{
 		let count = 0;
 		const notes = DataApi.GetNotes();
-		notes.forEach((note: Note) => {
+		notes.forEach((note: Note) => 
+		{
 			if (note.HasProject(this))
 				count++;
 		});
 		return count;
 	}
 
-
-	public _GetID(): string { return this.objectRef.id; }
+	public Id(): string 
+	{
+		return this.objectRef.id; 
+	}
 
 	public Delete(): void
 	{

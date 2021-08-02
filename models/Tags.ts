@@ -15,12 +15,12 @@ export interface Color
 	a?: number | undefined
 }
 
-
 export interface TagModel extends TagProperties, ObjectReference {}
 
 export class Tag
 {
 	private properties: TagProperties
+
 	private objectRef: ObjectReference
 	
 	public isDeleted = false
@@ -57,10 +57,25 @@ export class Tag
 		DataApi.UpdateTag(this);
 	}
 
-	public GetName(): string { return this.properties.name; }
-	public GetColor(): Color { return this.properties.color; }
-	public GetColorAsCss(): string { return `rgb(${this.GetColor().r}, ${this.GetColor().g}, ${this.GetColor().b})`; }
-	public _GetID(): string { return this.objectRef.id; }
+	public GetName(): string 
+	{
+		return this.properties.name; 
+	}
+
+	public GetColor(): Color 
+	{
+		return this.properties.color; 
+	}
+
+	public GetColorAsCss(): string 
+	{
+		return `rgb(${this.GetColor().r}, ${this.GetColor().g}, ${this.GetColor().b})`; 
+	}
+
+	public Id(): string 
+	{
+		return this.objectRef.id; 
+	}
 
 	public Delete(): void
 	{

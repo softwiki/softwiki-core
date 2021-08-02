@@ -3,61 +3,67 @@ import { DataApiClass } from "./DataApi";
 import DataProvider from "./DataProvider";
 import MockedDataProvider, {ICollections} from "./MockedDataProvider";
 
-describe("Frequent cases", () => {
-
+describe("Frequent cases", () => 
+{
 	const mockedDataProvider: DataProvider = new MockedDataProvider({notes: [], tags: [], projects: []});
 	const dataApi = new DataApiClass(mockedDataProvider);
 
-	describe("First note ever", () => {
-
+	describe("First note ever", () => 
+	{
 		let notes: Note[];
 	
-		test("Notes list is empty", () => {
+		test("Notes list is empty", () => 
+		{
 			notes = dataApi.GetNotes();
 			expect(notes).toHaveLength(0);
 		});
 	
-		test("Add a note, but previous note list is still be empty", async () => {
+		test("Add a note, but previous note list is still be empty", async () => 
+		{
 			await dataApi.CreateNote({title: "Note 1", content: "test", tags: [], project: undefined});
 			expect(notes).toHaveLength(0);
 		});
 	
-		test("Note list have 1 element", () => {
+		test("Note list have 1 element", () => 
+		{
 			notes = dataApi.GetNotes();
 			expect(notes).toHaveLength(1);
 		});
 	});
 
-	describe("Create 2 more notes", () => {
-		
-		test("Second note", async () => {
+	describe("Create 2 more notes", () => 
+	{
+		test("Second note", async () => 
+		{
 			expect(dataApi.GetNotes()).toHaveLength(1);
 			await dataApi.CreateNote({title: "Note 2", content: "test", tags: [], project: undefined});
 			expect(dataApi.GetNotes()).toHaveLength(2);
 		});
 
-		test("Third note", async () => {
+		test("Third note", async () => 
+		{
 			expect(dataApi.GetNotes()).toHaveLength(2);
 			await dataApi.CreateNote({title: "Note 3", content: "test", tags: [], project: undefined});
 			expect(dataApi.GetNotes()).toHaveLength(3);
 		});
 	});
 
-	describe("Edit notes", () => {
-
+	describe("Edit notes", () => 
+	{
 		const NotesStates: any = [
 			{START: "Note 1", END: "Note 1 edited"},
 			{START: "Note 2", END: "Note 2 edited"},
 			{START: "Note 3", END: "Note 3 edited"}
 		];
 
-		beforeEach(() => {
+		beforeEach(() => 
+		{
 			const notes = dataApi.GetNotes();
 			expect(notes).toHaveLength(3);
 		});
 
-		test("First note", async () => {
-
+		test("First note", async () => 
+		{
 			const NOTE_INDEX = 0;
 
 			let notes = dataApi.GetNotes();
@@ -73,8 +79,8 @@ describe("Frequent cases", () => {
 			expect(notes[2].GetTitle()).toBe(NotesStates[2].START);
 		});
 
-		test("Second note", async () => {
-
+		test("Second note", async () => 
+		{
 			const NOTE_INDEX = 1;
 
 			let notes = dataApi.GetNotes();
@@ -90,8 +96,8 @@ describe("Frequent cases", () => {
 			expect(notes[2].GetTitle()).toBe(NotesStates[2].START);
 		});
 
-		test("Last note", async () => {
-
+		test("Last note", async () => 
+		{
 			const NOTE_INDEX = 2;
 
 			let notes = dataApi.GetNotes();
@@ -106,12 +112,12 @@ describe("Frequent cases", () => {
 			expect(notes[1].GetTitle()).toBe(NotesStates[1].END);
 			expect(notes[2].GetTitle()).toBe(NotesStates[2].END);
 		});
-
 	});
 
-	describe("Delete notes", () => {
-
-		test("Second note", async () => {
+	describe("Delete notes", () => 
+	{
+		test("Second note", async () => 
+		{
 			const notesBefore = dataApi.GetNotes();
 			expect(notesBefore).toHaveLength(3);
 
@@ -120,11 +126,12 @@ describe("Frequent cases", () => {
 			const notesAfter = dataApi.GetNotes();
 			expect(notesAfter).toHaveLength(2);
 
-			expect(notesAfter[0]._GetID()).toBe(notesBefore[0]._GetID());
-			expect(notesAfter[1]._GetID()).toBe(notesBefore[2]._GetID());
+			expect(notesAfter[0].Id()).toBe(notesBefore[0].Id());
+			expect(notesAfter[1].Id()).toBe(notesBefore[2].Id());
 		});
 
-		test("First note", async () => {
+		test("First note", async () => 
+		{
 			const notesBefore = dataApi.GetNotes();
 			expect(notesBefore).toHaveLength(2);
 
@@ -133,10 +140,11 @@ describe("Frequent cases", () => {
 			const notesAfter = dataApi.GetNotes();
 			expect(notesAfter).toHaveLength(1);
 
-			expect(notesAfter[0]._GetID()).toBe(notesBefore[1]._GetID());
+			expect(notesAfter[0].Id()).toBe(notesBefore[1].Id());
 		});
 
-		test("Last note", async () => {
+		test("Last note", async () => 
+		{
 			const notesBefore = dataApi.GetNotes();
 			expect(notesBefore).toHaveLength(1);
 
@@ -148,8 +156,8 @@ describe("Frequent cases", () => {
 	});
 });
 
-describe("Tags", () => {
-
+describe("Tags", () => 
+{
 	const fakeData: ICollections = {
 		notes: [
 			{title: "First note", content: "Amazing content", tags: [], id: "1", project: undefined, custom: null},
@@ -168,7 +176,8 @@ describe("Tags", () => {
 	let notes: Note[];
 	let tags: Tag[];
 
-	beforeEach(async () => {
+	beforeEach(async () => 
+	{
 		const mockedDataProvier = new MockedDataProvider(JSON.parse(JSON.stringify(fakeData)));
 		dataApi = new DataApiClass(mockedDataProvier);
 		await dataApi.Setup();
@@ -181,28 +190,32 @@ describe("Tags", () => {
 		expect(notes[2].GetTags()).toHaveLength(2);
 	});
 
-	test("Adding the first tag", () => {
+	test("Adding the first tag", () => 
+	{
 		dataApi.AddTagToNote(notes[0], tags[0]);
 
 		notes = dataApi.GetNotes();
 		expect(notes[0].GetTags()).toHaveLength(1);
 	});
 
-	test("Adding the third tag", () => {
+	test("Adding the third tag", () => 
+	{
 		dataApi.AddTagToNote(notes[2], tags[2]);
 
 		notes = dataApi.GetNotes();
 		expect(notes[2].GetTags()).toHaveLength(3);
 	});
 
-	test("Adding tag that already exists on the note does nothing", () => {
+	test("Adding tag that already exists on the note does nothing", () => 
+	{
 		dataApi.AddTagToNote(notes[2], tags[0]);
 
 		notes = dataApi.GetNotes();
 		expect(notes[2].GetTags()).toHaveLength(2);
 	});
 
-	test("Removing the last tag from a note", () => {
+	test("Removing the last tag from a note", () => 
+	{
 		dataApi.RemoveTagFromNote(notes[1], tags[0]);
 
 		notes = dataApi.GetNotes();
@@ -211,7 +224,8 @@ describe("Tags", () => {
 		expect(notes[2].GetTags()).toHaveLength(2);
 	});
 
-	test("Removing a tag from a note", () => {
+	test("Removing a tag from a note", () => 
+	{
 		dataApi.RemoveTagFromNote(notes[2], tags[0]);
 
 		notes = dataApi.GetNotes();
@@ -220,7 +234,8 @@ describe("Tags", () => {
 		expect(notes[2].GetTags()).toHaveLength(1);
 	});
 
-	test("Deleting a tag that exists on a single note", () => {
+	test("Deleting a tag that exists on a single note", () => 
+	{
 		dataApi.DeleteTag(tags[1]);
 		notes = dataApi.GetNotes();
 		expect(notes[0].GetTags()).toHaveLength(0);
@@ -228,7 +243,8 @@ describe("Tags", () => {
 		expect(notes[2].GetTags()).toHaveLength(1);
 	});
 
-	test("Deleting a tag that exists on multiple notes", () => {
+	test("Deleting a tag that exists on multiple notes", () => 
+	{
 		dataApi.DeleteTag(tags[0]);
 		notes = dataApi.GetNotes();
 		expect(notes[0].GetTags()).toHaveLength(0);

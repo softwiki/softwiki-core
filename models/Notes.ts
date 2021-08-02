@@ -68,15 +68,29 @@ export class Note
 		return updatedNote;
 	}
 
-	public GetTitle(): string { return this.properties.title; }
-	public GetContent(): string { return this.properties.content; }
-	public _GetID(): string { return this.objectRef.id; }
+	public GetTitle(): string
+	{
+		return this.properties.title;
+	}
+	
+	public GetContent(): string 
+	{
+		return this.properties.content;
+	}
 
-	public GetTags(): Tag[] {
+	public Id(): string 
+	{
+		return this.objectRef.id; 
+	}
+
+	public GetTags(): Tag[]
+	{
 		const tags = this.dataApi.GetTags();
+
 		const tagsObject: Tag[] = [];
-		tags.forEach((tag: Tag) => {
-			if (this.properties.tags.indexOf(tag._GetID()) !== -1)
+		tags.forEach((tag: Tag) =>
+		{
+			if (this.properties.tags.indexOf(tag.Id()) !== -1)
 				tagsObject.push(tag);
 		});
 		return tagsObject;
@@ -84,19 +98,22 @@ export class Note
 
 	public HasProject(project: Project): boolean
 	{
-		return this.properties.project !== undefined && this.properties.project === project._GetID();
+		return this.properties.project !== undefined && this.properties.project === project.Id();
 	}
 
 	public GetProject(): Project | undefined
 	{
 		const projects = this.dataApi.GetProjects();
-		const project = projects.find((project: Project) => { return project._GetID() === this.properties.project; });
+		const project = projects.find((project: Project) => 
+		{
+			return project.Id() === this.properties.project; 
+		});
 		return project;
 	}
 
 	public HasTag(tag: Tag): boolean
 	{
-		return this.properties.tags.indexOf(tag._GetID()) !== -1;
+		return this.properties.tags.indexOf(tag.Id()) !== -1;
 	}
 
 	public Delete(): void
