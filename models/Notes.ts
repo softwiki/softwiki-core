@@ -55,6 +55,12 @@ export class Note
 		this._properties.content = content;
 		this._dataApi.updateNote(this);
 	}
+	
+	public setProject(project: Project | null): void
+	{
+		this._properties.project = project ? project.getId() : undefined;
+		this._dataApi.updateNote(this);
+	}
 
 	public addTag(tag: Tag): Note
 	{
