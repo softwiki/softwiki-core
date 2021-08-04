@@ -10,56 +10,56 @@ export interface ProjectModel extends ProjectProperties, ObjectReference {}
 
 export class Project
 {
-	private properties: ProjectProperties
-	private objectRef: ObjectReference
+	private _properties: ProjectProperties
+	private _objectRef: ObjectReference
 
 	constructor(properties: ProjectModel)
 	{
-		this.properties = {
+		this._properties = {
 			name: properties.name
 		};
 
-		this.objectRef = {
+		this._objectRef = {
 			id: properties.id,
 			custom: properties.custom
 		};
 	}
 
-	public SetName(name: string): void
+	public setName(name: string): void
 	{
-		this.properties.name = name;
-		DataApi.UpdateProject(this);
+		this._properties.name = name;
+		DataApi.updateProject(this);
 	}
 
-	public GetName(): string
+	public getName(): string
 	{
-		return this.properties.name;
+		return this._properties.name;
 	}
 
-	public NoteCount(): number // [TODO] Optimize or find another way
+	public getNoteCount(): number // [TODO] Optimize or find another way
 	{
 		let count = 0;
-		const notes = DataApi.GetNotes();
+		const notes = DataApi.getNotes();
 		notes.forEach((note: Note) => 
 		{
-			if (note.HasProject(this))
+			if (note.hasProject(this))
 				count++;
 		});
 		return count;
 	}
 
-	public Id(): string 
+	public getId(): string 
 	{
-		return this.objectRef.id; 
+		return this._objectRef.id; 
 	}
 
-	public Delete(): void
+	public delete(): void
 	{
-		DataApi.DeleteProject(this);
+		DataApi.deleteProject(this);
 	}
 
-	public GetModel(): ProjectModel
+	public getModel(): ProjectModel
 	{
-		return {...this.properties, ...this.objectRef};
+		return {...this._properties, ...this._objectRef};
 	}
 }

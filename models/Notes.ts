@@ -20,110 +20,110 @@ export interface NoteModel extends NoteProperties, ObjectReference {}
 
 export class Note
 {
-	private properties: NoteProperties
-	private objectRef: ObjectReference
+	private _properties: NoteProperties
+	private _objectRef: ObjectReference
 	
 	public isDeleted = false;
 
-	constructor(properties: NoteModel, private dataApi: DataApiClass)
+	constructor(properties: NoteModel, private _dataApi: DataApiClass)
 	{
-		this.properties = {
+		this._properties = {
 			title: properties.title,
 			content: properties.content,
 			tags: properties.tags,
 			project: properties.project
 		};
 
-		this.objectRef = {
+		this._objectRef = {
 			id: properties.id,
 			custom: properties.custom
 		};
 	}
 
-	public SetTitle(title: string): void
+	public setTitle(title: string): void
 	{
-		if (this.properties.title === title)
+		if (this._properties.title === title)
 			return;
-		this.properties.title = title;
-		this.dataApi.UpdateNote(this);
+		this._properties.title = title;
+		this._dataApi.updateNote(this);
 	}
 
-	public SetContent(content: string): void
+	public setContent(content: string): void
 	{
-		if (this.properties.content === content)
+		if (this._properties.content === content)
 			return;
-		this.properties.content = content;
-		this.dataApi.UpdateNote(this);
+		this._properties.content = content;
+		this._dataApi.updateNote(this);
 	}
 
-	public AddTag(tag: Tag): Note
+	public addTag(tag: Tag): Note
 	{
-		const updatedNote = this.dataApi.AddTagToNote(this, tag);
+		const updatedNote = this._dataApi.addTagToNote(this, tag);
 		return updatedNote;
 	}
 
-	public RemoveTag(tag: Tag): Note
+	public removeTag(tag: Tag): Note
 	{
-		const updatedNote = this.dataApi.RemoveTagFromNote(this, tag);
+		const updatedNote = this._dataApi.removeTagFromNote(this, tag);
 		return updatedNote;
 	}
 
-	public GetTitle(): string
+	public getTitle(): string
 	{
-		return this.properties.title;
+		return this._properties.title;
 	}
 	
-	public GetContent(): string 
+	public getContent(): string 
 	{
-		return this.properties.content;
+		return this._properties.content;
 	}
 
-	public Id(): string 
+	public getId(): string 
 	{
-		return this.objectRef.id; 
+		return this._objectRef.id; 
 	}
 
-	public GetTags(): Tag[]
+	public getTags(): Tag[]
 	{
-		const tags = this.dataApi.GetTags();
+		const tags = this._dataApi.getTags();
 
 		const tagsObject: Tag[] = [];
 		tags.forEach((tag: Tag) =>
 		{
-			if (this.properties.tags.indexOf(tag.Id()) !== -1)
+			if (this._properties.tags.indexOf(tag.getId()) !== -1)
 				tagsObject.push(tag);
 		});
 		return tagsObject;
 	}
 
-	public HasProject(project: Project): boolean
+	public hasProject(project: Project): boolean
 	{
-		return this.properties.project !== undefined && this.properties.project === project.Id();
+		return this._properties.project !== undefined && this._properties.project === project.getId();
 	}
 
-	public GetProject(): Project | undefined
+	public getProject(): Project | undefined
 	{
-		const projects = this.dataApi.GetProjects();
+		const projects = this._dataApi.getProjects();
 		const project = projects.find((project: Project) => 
 		{
-			return project.Id() === this.properties.project; 
+			return project.getId() === this._properties.project; 
 		});
 		return project;
 	}
 
-	public HasTag(tag: Tag): boolean
+	public hasTag(tag: Tag): boolean
 	{
-		return this.properties.tags.indexOf(tag.Id()) !== -1;
+		return this._properties.tags.indexOf(tag.getId()) !== -1;
 	}
 
-	public Delete(): void
+	public delete(): void
 	{
-		this.dataApi.DeleteNote(this);
+		this._dataApi.deleteNote(this);
 		this.isDeleted = true;
 	}
 
-	public GetModel(): NoteModel
+	public getModel(): NoteModel
 	{
-		return {...this.properties, ...this.objectRef};
+		return {...this._properties, ...this._objectRef};
 	}
 }

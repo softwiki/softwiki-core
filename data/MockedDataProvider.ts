@@ -12,8 +12,8 @@ export interface ICollections
 }
 
 const Collections = {
-	Notes: "notes",
-	Tags: "tags",
+	notes: "notes",
+	tags: "tags",
 	projects: "projects"
 };
 
@@ -29,50 +29,49 @@ export default class FakeDataProvider extends DataProvider
 		this.collections = fakeCollections;
 	}
 
-	public async Setup(): Promise<void> {}
+	public async setup(): Promise<void> {}
 
-	public async CreateNote(properties: NoteProperties): Promise<NoteModel>
+	public async createNote(properties: NoteProperties): Promise<NoteModel>
 	{
 		this.nextId++;
 		return {...properties, id: this.nextId.toString(), custom: {}};
 	}
 
-	public async GetNotes(): Promise<NoteModel[]>
+	public async getNotes(): Promise<NoteModel[]>
 	{
 		return this.collections.notes;
 	}
 
-	public async DeleteNote(note: NoteModel): Promise<void> {}
-	public async UpdateNote(note: NoteModel): Promise<void> {}
-	public async RemoveTagFromNote(note: NoteModel, tag: Tag): Promise<void> {}
-	public async AddTagToNote(note: NoteModel, tag: Tag): Promise<void> {}
+	public async deleteNote(note: NoteModel): Promise<void> {}
+	public async updateNote(note: NoteModel): Promise<void> {}
+	public async removeTagFromNote(note: NoteModel, tag: Tag): Promise<void> {}
+	public async addTagToNote(note: NoteModel, tag: Tag): Promise<void> {}
 
-	public async CreateTag(document: TagProperties): Promise<TagModel>
+	public async createTag(document: TagProperties): Promise<TagModel>
 	{
 		this.nextId++;
 		return {...document, id: this.nextId.toString(), custom: {}};
 	}
 
-	public async GetTags(): Promise<TagModel[]>
+	public async getTags(): Promise<TagModel[]>
 	{
 		return this.collections.tags;
 	}
 
-	public async DeleteTag(tag: TagModel): Promise<void> {}
-	public async UpdateTag(tag: TagModel): Promise<void> {}
+	public async deleteTag(tag: TagModel): Promise<void> {}
+	public async updateTag(tag: TagModel): Promise<void> {}
 
-	public async CreateProject(document: ProjectProperties): Promise<ProjectModel>
+	public async createProject(document: ProjectProperties): Promise<ProjectModel>
 	{
 		this.nextId++;
 		return {...document, id: this.nextId.toString(), custom: {}};
 	}
 
-	public async GetProjects(): Promise<ProjectModel[]>
+	public async getProjects(): Promise<ProjectModel[]>
 	{
 		return this.collections.projects;
 	}
 
-	public async DeleteProject(tag: ProjectModel): Promise<void> {}
-	public async UpdateProject(tag: ProjectModel): Promise<void> {}
-
+	public async deleteProject(tag: ProjectModel): Promise<void> {}
+	public async updateProject(tag: ProjectModel): Promise<void> {}
 }

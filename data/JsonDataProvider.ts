@@ -1,7 +1,7 @@
 import { NoteModel, Tag, TagModel, TagProperties, NoteProperties } from "../models";
 import DataProvider from "./DataProvider";
 
-import { WriteFile, ReadFile } from "../Files";
+import { writeFile, readFile } from "../Files";
 import { ProjectModel, ProjectProperties } from "../models/Project";
 
 interface ICollections
@@ -12,11 +12,9 @@ interface ICollections
 	projects: ProjectModel[]
 }
 
-const Collections = {
-	Notes: "notes",
-	Tags: "tags",
-	Projects: "projects"
-};
+const COLLECTION_NOTES = "notes";
+const COLLECTION_TAGS = "tags";
+const COLLECTION_PROJECTS = "projects";
 
 export default class JsonDataProvider extends DataProvider
 {
@@ -33,11 +31,11 @@ export default class JsonDataProvider extends DataProvider
 		};
 	}
 
-	public async Setup(): Promise<void>
+	public async setup(): Promise<void>
 	{
 		try
 		{
-			const data = await ReadFile("db.json");
+			const data = await readFile("db.json");
 			this.collections = JSON.parse(data)	;
 		}
 		catch (e)
@@ -46,163 +44,163 @@ export default class JsonDataProvider extends DataProvider
 		}
 	}
 
-	public async CreateNote(properties: NoteProperties): Promise<NoteModel>
+	public async createNote(properties: NoteProperties): Promise<NoteModel>
 	{
-		const documentDB = this.CreateDocument(properties);
-		const collection = this.GetCollection(Collections.Notes);
+		const documentDB = this._createDocument(properties);
+		const collection = this._getCollection(COLLECTION_NOTES);
 
 		collection.push(documentDB);
-		await this.WriteDB();
+		await this._writeDB();
 		return documentDB as NoteModel;
 	}
 
-	public async GetNotes(): Promise<NoteModel[]>
+	public async getNotes(): Promise<NoteModel[]>
 	{
-		return JSON.parse(JSON.stringify(this.GetCollection(Collections.Notes))); // Another way of cloning ?
+		return JSON.parse(JSON.stringify(this._getCollection(COLLECTION_NOTES))); // Another way of cloning ?
 	}
 
-	public async DeleteNote(note: NoteModel): Promise<void>
+	public async deleteNote(note: NoteModel): Promise<void>
 	{
-		const collection = this.GetCollection<NoteModel>(Collections.Notes);
-		const index = this.GetIndexInCollectionByID(Collections.Notes, note.id);
+		const collection = this._getCollection<NoteModel>(COLLECTION_NOTES);
+		const index = this._getIndexInCollectionByID(COLLECTION_NOTES, note.id);
 
 		if (index !== -1)
 		{
 			collection.splice(index, 1);
-			await this.WriteDB();
+			await this._writeDB();
 			return ;
 		}
 	}
 
-	public async UpdateNote(note: NoteModel): Promise<void>
+	public async updateNote(note: NoteModel): Promise<void>
 	{
-		const collection = this.GetCollection<NoteModel>(Collections.Notes);
-		const index = this.GetIndexInCollectionByID(Collections.Notes, note.id);
+		const collection = this._getCollection<NoteModel>(COLLECTION_NOTES);
+		const index = this._getIndexInCollectionByID(COLLECTION_NOTES, note.id);
 		
 		if (index !== -1)
 		{
 			collection[index] = note;
-			await this.WriteDB();
+			await this._writeDB();
 		}
 	}
 	
-	public async RemoveTagFromNote(note: NoteModel, tag: Tag): Promise<void>
+	public async removeTagFromNote(note: NoteModel, tag: Tag): Promise<void>
 	{
-		const collection = this.GetCollection<NoteModel>(Collections.Notes);
-		const index = this.GetIndexInCollectionByID(Collections.Notes, note.id);
-		const tagIndex = collection[index].tags.indexOf(tag.Id());
+		const collection = this._getCollection<NoteModel>(COLLECTION_NOTES);
+		const index = this._getIndexInCollectionByID(COLLECTION_NOTES, note.id);
+		const tagIndex = collection[index].tags.indexOf(tag.getId());
 
 		collection[index].tags.splice(tagIndex, 1);
-		await this.WriteDB();
+		await this._writeDB();
 	}
 
-	public async AddTagToNote(note: NoteModel, tag: Tag): Promise<void>
+	public async addTagToNote(note: NoteModel, tag: Tag): Promise<void>
 	{
-		const collection = this.GetCollection<NoteModel>(Collections.Notes);
-		const index = this.GetIndexInCollectionByID(Collections.Notes, note.id);
+		const collection = this._getCollection<NoteModel>(COLLECTION_NOTES);
+		const index = this._getIndexInCollectionByID(COLLECTION_NOTES, note.id);
 
-		collection[index].tags.push(tag.Id());
-		await this.WriteDB();
+		collection[index].tags.push(tag.getId());
+		await this._writeDB();
 	}
 
-	public async CreateTag(document: TagProperties): Promise<TagModel>
+	public async createTag(document: TagProperties): Promise<TagModel>
 	{
-		const documentDB = this.CreateDocument(document);
-		const collection = this.GetCollection(Collections.Tags);
+		const documentDB = this._createDocument(document);
+		const collection = this._getCollection(COLLECTION_TAGS);
 
 		collection.push(documentDB);
-		await this.WriteDB();
+		await this._writeDB();
 		return documentDB as TagModel;
 	}
 
-	public async GetTags(): Promise<TagModel[]>
+	public async getTags(): Promise<TagModel[]>
 	{
-		return JSON.parse(JSON.stringify(this.GetCollection(Collections.Tags)));
+		return JSON.parse(JSON.stringify(this._getCollection(COLLECTION_TAGS)));
 	}
 
-	public async DeleteTag(tag: TagModel): Promise<void>
+	public async deleteTag(tag: TagModel): Promise<void>
 	{
-		const collection = this.GetCollection<TagModel>(Collections.Tags);
-		const index = this.GetIndexInCollectionByID(Collections.Tags, tag.id);
+		const collection = this._getCollection<TagModel>(COLLECTION_TAGS);
+		const index = this._getIndexInCollectionByID(COLLECTION_TAGS, tag.id);
 
 		if (index !== -1)
 		{
 			collection.splice(index, 1);
-			await this.WriteDB();
+			await this._writeDB();
 			return ;
 		}
 	}
 
-	public async UpdateTag(tag: TagModel): Promise<void>
+	public async updateTag(tag: TagModel): Promise<void>
 	{
-		const collection = this.GetCollection<TagModel>(Collections.Tags);
-		const index = this.GetIndexInCollectionByID(Collections.Tags, tag.id);
+		const collection = this._getCollection<TagModel>(COLLECTION_TAGS);
+		const index = this._getIndexInCollectionByID(COLLECTION_TAGS, tag.id);
 		
 		if (index !== -1)
 		{
 			collection[index] = tag;
-			await this.WriteDB();
+			await this._writeDB();
 			return ;
 		}
 	}
 
 	// ---
 
-	public async CreateProject(document: ProjectProperties): Promise<ProjectModel>
+	public async createProject(document: ProjectProperties): Promise<ProjectModel>
 	{
-		const documentDB = this.CreateDocument(document);
-		const collection = this.GetCollection(Collections.Projects);
+		const documentDB = this._createDocument(document);
+		const collection = this._getCollection(COLLECTION_PROJECTS);
 
 		collection.push(documentDB);
-		await this.WriteDB();
+		await this._writeDB();
 		return documentDB as ProjectModel;
 	}
 
-	public async GetProjects(): Promise<ProjectModel[]>
+	public async getProjects(): Promise<ProjectModel[]>
 	{
-		return JSON.parse(JSON.stringify(this.GetCollection(Collections.Projects)));
+		return JSON.parse(JSON.stringify(this._getCollection(COLLECTION_PROJECTS)));
 	}
 
-	public async DeleteProject(project: ProjectModel): Promise<void>
+	public async deleteProject(project: ProjectModel): Promise<void>
 	{
-		const collection = this.GetCollection<ProjectModel>(Collections.Projects);
-		const index = this.GetIndexInCollectionByID(Collections.Projects, project.id);
+		const collection = this._getCollection<ProjectModel>(COLLECTION_PROJECTS);
+		const index = this._getIndexInCollectionByID(COLLECTION_PROJECTS, project.id);
 
 		if (index !== -1)
 		{
 			collection.splice(index, 1);
-			await this.WriteDB();
+			await this._writeDB();
 			return ;
 		}
 	}
 
-	public async UpdateProject(project: ProjectModel): Promise<void>
+	public async updateProject(project: ProjectModel): Promise<void>
 	{
-		const collection = this.GetCollection<ProjectModel>(Collections.Projects);
-		const index = this.GetIndexInCollectionByID(Collections.Projects, project.id);
+		const collection = this._getCollection<ProjectModel>(COLLECTION_PROJECTS);
+		const index = this._getIndexInCollectionByID(COLLECTION_PROJECTS, project.id);
 		
 		if (index !== -1)
 		{
 			collection[index] = project;
-			await this.WriteDB();
+			await this._writeDB();
 			return ;
 		}
 	}
 
-	private CreateDocument(originalDocument: any): any
+	private _createDocument(originalDocument: any): any
 	{
 		return {...originalDocument, id: Date.now()};
 	}
 
-	private GetCollection<T>(collectionName: string): T[]
+	private _getCollection<T>(collectionName: string): T[]
 	{
 		const collection = this.collections[collectionName];
 		return collection as unknown as T[];
 	}
 
-	private GetIndexInCollectionByID(collectionName: string, id: string): number
+	private _getIndexInCollectionByID(collectionName: string, id: string): number
 	{
-		const collection = this.GetCollection(collectionName) as any;
+		const collection = this._getCollection(collectionName) as any;
 		for (let i = 0; i < collection.length; i++)
 		{
 			if (collection[i].id === id)
@@ -211,8 +209,8 @@ export default class JsonDataProvider extends DataProvider
 		return -1;
 	}
 
-	private async WriteDB(): Promise<void>
+	private async _writeDB(): Promise<void>
 	{
-		await WriteFile("db.json", JSON.stringify(this.collections, null, 4));
+		await writeFile("db.json", JSON.stringify(this.collections, null, 4));
 	}
 }

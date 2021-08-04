@@ -15,190 +15,190 @@ export enum DataEvent
 
 export class DataApiClass
 {
-	private cache: {notes: NoteModel[], tags: TagModel[], projects: ProjectModel[]}
+	private _cache: {notes: NoteModel[], tags: TagModel[], projects: ProjectModel[]}
 		= {notes: [], tags: [], projects: []}
 
-	private queue: Queue
+	private _queue: Queue
 
-	constructor(private dataProvider: DataProvider)
+	constructor(private _dataProvider: DataProvider)
 	{
-		this.queue = new Queue();
+		this._queue = new Queue();
 	}
 
-	public async Setup(): Promise<void>
+	public async setup(): Promise<void>
 	{
-		await this.dataProvider.Setup();
-		this.cache.notes = await this.dataProvider.GetNotes();
-		this.cache.tags = await this.dataProvider.GetTags();
-		this.cache.projects = await this.dataProvider.GetProjects();
+		await this._dataProvider.setup();
+		this._cache.notes = await this._dataProvider.getNotes();
+		this._cache.tags = await this._dataProvider.getTags();
+		this._cache.projects = await this._dataProvider.getProjects();
 	}
 
 	// Notes
 
-	public CreateNote(properties: NoteProperties): Promise<void>
+	public createNote(properties: NoteProperties): Promise<void>
 	{
 		return new Promise((resolve, reject) => 
 		{
-			this.queue.Add(async () => 
+			this._queue.add(async () => 
 			{ 
-				const newlyCreatedNote = await this.dataProvider.CreateNote(properties);
-				this.cache.notes.push(newlyCreatedNote);
-				Event.Run(DataEvent.NotesUpdated);
-				Event.Run(DataEvent.NoteCreated, {note: new Note(newlyCreatedNote, this)});
+				const newlyCreatedNote = await this._dataProvider.createNote(properties);
+				this._cache.notes.push(newlyCreatedNote);
+				Event.run(DataEvent.NotesUpdated);
+				Event.run(DataEvent.NoteCreated, {note: new Note(newlyCreatedNote, this)});
 				resolve();
 			});
 		});
 	}
 
-	public GetNotes(): Note[]
+	public getNotes(): Note[]
 	{
-		const notes = this.cache.notes.map((noteModel: NoteModel) => new Note(noteModel, this));
+		const notes = this._cache.notes.map((noteModel: NoteModel) => new Note(noteModel, this));
 		return notes;
 	}
 	
-	public DeleteNote(note: Note): void
+	public deleteNote(note: Note): void
 	{
-		this.queue.Add(async () => { this.dataProvider.DeleteNote(note.GetModel());});
-		const index = this.GetNoteModelIndexInCache(note);
+		this._queue.add(async () => { this._dataProvider.deleteNote(note.getModel());});
+		const index = this._getNoteModelIndexInCache(note);
 		if (index !== -1)
-			this.cache.notes.splice(index, 1);
-		Event.Run(DataEvent.NotesUpdated);
+			this._cache.notes.splice(index, 1);
+		Event.run(DataEvent.NotesUpdated);
 	}
 
-	public UpdateNote(note: Note): void
+	public updateNote(note: Note): void
 	{
-		this.queue.Add(async () => { await this.dataProvider.UpdateNote(note.GetModel());});
+		this._queue.add(async () => { await this._dataProvider.updateNote(note.getModel());});
 
-		this.cache.notes[this.GetNoteModelIndexInCache(note)] = note.GetModel();
-		Event.Run(DataEvent.NotesUpdated);
+		this._cache.notes[this._getNoteModelIndexInCache(note)] = note.getModel();
+		Event.run(DataEvent.NotesUpdated);
 	}
 
-	public RemoveTagFromNote(note: Note, tag: Tag): Note
+	public removeTagFromNote(note: Note, tag: Tag): Note
 	{
-		this.queue.Add(async () => { this.dataProvider.RemoveTagFromNote(note.GetModel(), tag);});
-		const noteModel = this.GetNoteModelInCache(note);
+		this._queue.add(async () => { this._dataProvider.removeTagFromNote(note.getModel(), tag);});
+		const noteModel = this._getNoteModelInCache(note);
 		if (!noteModel)
 			return note; // [TODO] Handle error if note doesn't exist instead of returning the original note
 
-		const tagIndex = noteModel.tags.indexOf(tag.Id());
+		const tagIndex = noteModel.tags.indexOf(tag.getId());
 		if (tagIndex !== -1)
 			noteModel.tags.splice(tagIndex, 1);
 
-		Event.Run(DataEvent.NotesUpdated);
+		Event.run(DataEvent.NotesUpdated);
 
 		return new Note(noteModel, this);
 	}
 
-	public AddTagToNote(note: Note, tag: Tag): Note
+	public addTagToNote(note: Note, tag: Tag): Note
 	{
-		this.queue.Add(async () => { this.dataProvider.AddTagToNote(note.GetModel(), tag);});
-		const noteModel = this.GetNoteModelInCache(note);
+		this._queue.add(async () => { this._dataProvider.addTagToNote(note.getModel(), tag);});
+		const noteModel = this._getNoteModelInCache(note);
 		if (!noteModel)
 			return note; // [TODO] Handle error if note doesn't exist instead of returning the original note
 
-		noteModel.tags.push(tag.Id());
+		noteModel.tags.push(tag.getId());
 
-		Event.Run(DataEvent.NotesUpdated);
+		Event.run(DataEvent.NotesUpdated);
 		return new Note(noteModel, this);
 	}
 
 	// Tags
 
-	public async CreateTag(properties: TagProperties): Promise<void>
+	public async createTag(properties: TagProperties): Promise<void>
 	{
-		this.queue.Add(async () => 
+		this._queue.add(async () => 
 		{ 
-			const newlyCreatedTag = await this.dataProvider.CreateTag(properties);
-			this.cache.tags.push(newlyCreatedTag);
-			Event.Run(DataEvent.NotesUpdated);
+			const newlyCreatedTag = await this._dataProvider.createTag(properties);
+			this._cache.tags.push(newlyCreatedTag);
+			Event.run(DataEvent.NotesUpdated);
 		});
 	}
 
-	public GetTags(): Tag[]
+	public getTags(): Tag[]
 	{
-		const tags = this.cache.tags.map((tagModel: TagModel) => new Tag(tagModel));
+		const tags = this._cache.tags.map((tagModel: TagModel) => new Tag(tagModel));
 		return tags;
 	}
 
-	public DeleteTag(tag: Tag): void
+	public deleteTag(tag: Tag): void
 	{
-		this.queue.Add(async () => { this.dataProvider.DeleteTag(tag.GetModel());});
-		const index = this.GetTagModelIndexInCache(tag);
+		this._queue.add(async () => { this._dataProvider.deleteTag(tag.getModel());});
+		const index = this._getTagModelIndexInCache(tag);
 		if (index !== -1)
-			this.cache.tags.splice(index, 1);
+			this._cache.tags.splice(index, 1);
 
 		// [TODO] Delete tag on notes
-		Event.Run(DataEvent.NotesUpdated);
+		Event.run(DataEvent.NotesUpdated);
 	}
 
-	public UpdateTag(tag: Tag): Tag
+	public updateTag(tag: Tag): Tag
 	{
-		this.queue.Add(async () => { this.dataProvider.UpdateTag(tag.GetModel());});
-		this.cache.tags[this.GetTagModelIndexInCache(tag)] = tag.GetModel();
-		Event.Run(DataEvent.NotesUpdated);
-		return new Tag(tag.GetModel());
+		this._queue.add(async () => { this._dataProvider.updateTag(tag.getModel());});
+		this._cache.tags[this._getTagModelIndexInCache(tag)] = tag.getModel();
+		Event.run(DataEvent.NotesUpdated);
+		return new Tag(tag.getModel());
 	}
 
 	// Projects
 
-	public async CreateProject(properties: ProjectProperties): Promise<void>
+	public async createProject(properties: ProjectProperties): Promise<void>
 	{
-		this.queue.Add(async () => 
+		this._queue.add(async () => 
 		{
-			const newlyCreateProject = await this.dataProvider.CreateProject(properties);
-			this.cache.projects.push(newlyCreateProject);
-			Event.Run(DataEvent.ProjectsUpdated);
+			const newlyCreateProject = await this._dataProvider.createProject(properties);
+			this._cache.projects.push(newlyCreateProject);
+			Event.run(DataEvent.ProjectsUpdated);
 		});
 	}
 
-	public GetProjects(): Project[]
+	public getProjects(): Project[]
 	{
-		const projects = this.cache.projects.map((projectModel: ProjectModel) => new Project(projectModel));
+		const projects = this._cache.projects.map((projectModel: ProjectModel) => new Project(projectModel));
 		return projects;
 	}
 
-	public DeleteProject(project: Project): void
+	public deleteProject(project: Project): void
 	{
-		this.queue.Add(async () => { this.dataProvider.DeleteProject(project.GetModel());});
-		const index = this.GetProjectModelIndexInCache(project);
+		this._queue.add(async () => { this._dataProvider.deleteProject(project.getModel());});
+		const index = this._getProjectModelIndexInCache(project);
 		if (index !== -1)
-			this.cache.projects.splice(index, 1);
+			this._cache.projects.splice(index, 1);
 
 		// [TODO] Delete projects on notes
-		Event.Run(DataEvent.ProjectsUpdated);
+		Event.run(DataEvent.ProjectsUpdated);
 	}
 
-	public UpdateProject(project: Project): Project
+	public updateProject(project: Project): Project
 	{
-		this.queue.Add(async () => { this.dataProvider.UpdateProject(project.GetModel());});
-		this.cache.projects[this.GetProjectModelIndexInCache(project)] = project.GetModel();
-		Event.Run(DataEvent.NotesUpdated);
-		return new Project(project.GetModel());
+		this._queue.add(async () => { this._dataProvider.updateProject(project.getModel());});
+		this._cache.projects[this._getProjectModelIndexInCache(project)] = project.getModel();
+		Event.run(DataEvent.NotesUpdated);
+		return new Project(project.getModel());
 	}
 
-	private GetNoteModelIndexInCache(note: Note): number
+	private _getNoteModelIndexInCache(note: Note): number
 	{
-		return this.cache.notes.findIndex((noteModelCache: NoteModel) => noteModelCache.id === note.Id());
+		return this._cache.notes.findIndex((noteModelCache: NoteModel) => noteModelCache.id === note.getId());
 	}
 
-	private GetNoteModelInCache(note: Note): NoteModel | undefined
+	private _getNoteModelInCache(note: Note): NoteModel | undefined
 	{
-		return this.cache.notes.find((noteModelCache: NoteModel) => noteModelCache.id === note.Id());
+		return this._cache.notes.find((noteModelCache: NoteModel) => noteModelCache.id === note.getId());
 	}
 
-	private GetTagModelIndexInCache(tag: Tag): number
+	private _getTagModelIndexInCache(tag: Tag): number
 	{
-		return this.cache.tags.findIndex((tagModelCache: TagModel) => tagModelCache.id === tag.Id());
+		return this._cache.tags.findIndex((tagModelCache: TagModel) => tagModelCache.id === tag.getId());
 	}
 
-	private GetTagModelInCache(tag: Tag): TagModel | undefined
+	private _getTagModelInCache(tag: Tag): TagModel | undefined
 	{
-		return this.cache.tags.find((tagModelCache: TagModel) => tagModelCache.id === tag.Id());
+		return this._cache.tags.find((tagModelCache: TagModel) => tagModelCache.id === tag.getId());
 	}
 
-	private GetProjectModelIndexInCache(project: Project): number
+	private _getProjectModelIndexInCache(project: Project): number
 	{
-		return this.cache.projects.findIndex((projectModelCache: ProjectModel) => projectModelCache.id === project.Id());
+		return this._cache.projects.findIndex((projectModelCache: ProjectModel) => projectModelCache.id === project.getId());
 	}
 }
 

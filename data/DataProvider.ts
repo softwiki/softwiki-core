@@ -3,22 +3,22 @@ import { ProjectModel, ProjectProperties } from "../models/Project";
 
 export default abstract class DataProvider
 {
-	public abstract Setup(): Promise<void>
+	public abstract setup(): Promise<void>
 
-	public abstract CreateNote(properties: NoteProperties): Promise<NoteModel>
-	public abstract GetNotes(): Promise<NoteModel[]>
-	public abstract DeleteNote(note: NoteModel): Promise<void>
-	public abstract UpdateNote(note: NoteModel): Promise<void>
-	public abstract RemoveTagFromNote(note: NoteModel, tag: Tag): Promise<void>
-	public abstract AddTagToNote(note: NoteModel, tag: Tag): Promise<void>
+	public abstract createNote(properties: NoteProperties): Promise<NoteModel>
+	public abstract getNotes(): Promise<NoteModel[]>
+	public abstract deleteNote(note: NoteModel): Promise<void>
+	public abstract updateNote(note: NoteModel): Promise<void>
+	public abstract removeTagFromNote(note: NoteModel, tag: Tag): Promise<void>
+	public abstract addTagToNote(note: NoteModel, tag: Tag): Promise<void>
 
-	public abstract CreateTag(properties: TagProperties): Promise<TagModel>
-	public abstract GetTags(): Promise<TagModel[]>
-	public abstract DeleteTag(tag: TagModel): Promise<void>
-	public abstract UpdateTag(tag: TagModel): Promise<void>
+	public abstract createTag(properties: TagProperties): Promise<TagModel>
+	public abstract getTags(): Promise<TagModel[]>
+	public abstract deleteTag(tag: TagModel): Promise<void>
+	public abstract updateTag(tag: TagModel): Promise<void>
 
-	public abstract CreateProject(properties: ProjectProperties): Promise<ProjectModel>
-	public abstract GetProjects(): Promise<ProjectModel[]>
-	public abstract DeleteProject(tag: ProjectModel): Promise<void>
-	public abstract UpdateProject(tag: ProjectModel): Promise<void>
+	public abstract createProject(properties: ProjectProperties): Promise<ProjectModel>
+	public abstract getProjects(): Promise<ProjectModel[]>
+	public abstract deleteProject(tag: ProjectModel): Promise<void>
+	public abstract updateProject(tag: ProjectModel): Promise<void>
 }

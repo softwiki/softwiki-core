@@ -7,20 +7,20 @@ export default class Queue
 		this.queue = [];
 	}
 
-	public Add(f: () => Promise<void>): void
+	public add(f: () => Promise<void>): void
 	{
 		this.queue.push(f);
 		if (this.queue.length === 1)
-			this.Next();
+			this.next();
 	}
 
-	public async Next(): Promise<void>
+	public async next(): Promise<void>
 	{
 		if (this.queue.length === 0)
 			return ;
 		const f = this.queue[0];
 		await f();
 		this.queue.shift();
-		this.Next();
+		this.next();
 	}
 }

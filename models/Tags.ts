@@ -19,72 +19,71 @@ export interface TagModel extends TagProperties, ObjectReference {}
 
 export class Tag
 {
-	private properties: TagProperties
-
-	private objectRef: ObjectReference
+	private _properties: TagProperties
+	private _objectRef: ObjectReference
 	
 	public isDeleted = false
 
 	constructor(properties: TagModel)
 	{
-		this.properties = {
+		this._properties = {
 			name: properties.name,
 			color: properties.color
 		};
 
-		this.objectRef = {
+		this._objectRef = {
 			id: properties.id,
 			custom: properties.custom
 		};
 	}
 
-	public SetName(name: string): void
+	public setName(name: string): void
 	{
-		this.properties.name = name;
-		DataApi.UpdateTag(this);
+		this._properties.name = name;
+		DataApi.updateTag(this);
 	}
 
-	public SetColor(color: Color): void
+	public setColor(color: Color): void
 	{
-		this.properties.color = color;
-		DataApi.UpdateTag(this);
+		this._properties.color = color;
+		DataApi.updateTag(this);
 	}
 
-	public SetAll(properties: TagProperties): void
+	public setAll(properties: TagProperties): void
 	{
-		this.properties.name = properties.name;
-		this.properties.color = properties.color;
-		DataApi.UpdateTag(this);
+		this._properties.name = properties.name;
+		this._properties.color = properties.color;
+		DataApi.updateTag(this);
 	}
 
-	public GetName(): string 
+	public getName(): string 
 	{
-		return this.properties.name; 
+		return this._properties.name; 
 	}
 
-	public GetColor(): Color 
+	public getColor(): Color 
 	{
-		return this.properties.color; 
+		return this._properties.color; 
 	}
 
-	public GetColorAsCss(): string 
+	public getColorAsCss(): string 
 	{
-		return `rgb(${this.GetColor().r}, ${this.GetColor().g}, ${this.GetColor().b})`; 
+		return `rgb(${this.getColor().r}, ${this.getColor().g}, ${this.getColor().b})`; 
 	}
 
-	public Id(): string 
+	public getId(): string 
 	{
-		return this.objectRef.id; 
+		return this._objectRef.id; 
 	}
 
-	public Delete(): void
+	public delete(): void
 	{
-		DataApi.DeleteTag(this);
+		DataApi.deleteTag(this);
 		this.isDeleted = true;
 	}
 
-	public GetModel(): TagModel
+	public getModel(): TagModel
 	{
-		return {...this.properties, ...this.objectRef};
+		return {...this._properties, ...this._objectRef};
 	}
 }

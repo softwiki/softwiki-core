@@ -14,19 +14,19 @@ describe("Frequent cases", () =>
 	
 		test("Notes list is empty", () => 
 		{
-			notes = dataApi.GetNotes();
+			notes = dataApi.getNotes();
 			expect(notes).toHaveLength(0);
 		});
 	
 		test("Add a note, but previous note list is still be empty", async () => 
 		{
-			await dataApi.CreateNote({title: "Note 1", content: "test", tags: [], project: undefined});
+			await dataApi.createNote({title: "Note 1", content: "test", tags: [], project: undefined});
 			expect(notes).toHaveLength(0);
 		});
 	
 		test("Note list have 1 element", () => 
 		{
-			notes = dataApi.GetNotes();
+			notes = dataApi.getNotes();
 			expect(notes).toHaveLength(1);
 		});
 	});
@@ -35,30 +35,30 @@ describe("Frequent cases", () =>
 	{
 		test("Second note", async () => 
 		{
-			expect(dataApi.GetNotes()).toHaveLength(1);
-			await dataApi.CreateNote({title: "Note 2", content: "test", tags: [], project: undefined});
-			expect(dataApi.GetNotes()).toHaveLength(2);
+			expect(dataApi.getNotes()).toHaveLength(1);
+			await dataApi.createNote({title: "Note 2", content: "test", tags: [], project: undefined});
+			expect(dataApi.getNotes()).toHaveLength(2);
 		});
 
 		test("Third note", async () => 
 		{
-			expect(dataApi.GetNotes()).toHaveLength(2);
-			await dataApi.CreateNote({title: "Note 3", content: "test", tags: [], project: undefined});
-			expect(dataApi.GetNotes()).toHaveLength(3);
+			expect(dataApi.getNotes()).toHaveLength(2);
+			await dataApi.createNote({title: "Note 3", content: "test", tags: [], project: undefined});
+			expect(dataApi.getNotes()).toHaveLength(3);
 		});
 	});
 
 	describe("Edit notes", () => 
 	{
 		const NotesStates: any = [
-			{START: "Note 1", END: "Note 1 edited"},
-			{START: "Note 2", END: "Note 2 edited"},
-			{START: "Note 3", END: "Note 3 edited"}
+			{start: "Note 1", end: "Note 1 edited"},
+			{start: "Note 2", end: "Note 2 edited"},
+			{start: "Note 3", end: "Note 3 edited"}
 		];
 
 		beforeEach(() => 
 		{
-			const notes = dataApi.GetNotes();
+			const notes = dataApi.getNotes();
 			expect(notes).toHaveLength(3);
 		});
 
@@ -66,51 +66,51 @@ describe("Frequent cases", () =>
 		{
 			const NOTE_INDEX = 0;
 
-			let notes = dataApi.GetNotes();
+			let notes = dataApi.getNotes();
 			const note = notes[NOTE_INDEX];
 
-			expect(note.GetTitle()).toBe(NotesStates[NOTE_INDEX].START);
-			note.SetTitle(NotesStates[NOTE_INDEX].END);
-			expect(note.GetTitle()).toBe(NotesStates[NOTE_INDEX].END);
+			expect(note.getTitle()).toBe(NotesStates[NOTE_INDEX].start);
+			note.setTitle(NotesStates[NOTE_INDEX].end);
+			expect(note.getTitle()).toBe(NotesStates[NOTE_INDEX].end);
 
-			notes = dataApi.GetNotes();
-			expect(notes[0].GetTitle()).toBe(NotesStates[0].END);
-			expect(notes[1].GetTitle()).toBe(NotesStates[1].START);
-			expect(notes[2].GetTitle()).toBe(NotesStates[2].START);
+			notes = dataApi.getNotes();
+			expect(notes[0].getTitle()).toBe(NotesStates[0].end);
+			expect(notes[1].getTitle()).toBe(NotesStates[1].start);
+			expect(notes[2].getTitle()).toBe(NotesStates[2].start);
 		});
 
 		test("Second note", async () => 
 		{
 			const NOTE_INDEX = 1;
 
-			let notes = dataApi.GetNotes();
+			let notes = dataApi.getNotes();
 			const note = notes[NOTE_INDEX];
 
-			expect(note.GetTitle()).toBe(NotesStates[NOTE_INDEX].START);
-			note.SetTitle(NotesStates[NOTE_INDEX].END);
-			expect(note.GetTitle()).toBe(NotesStates[NOTE_INDEX].END);
+			expect(note.getTitle()).toBe(NotesStates[NOTE_INDEX].start);
+			note.setTitle(NotesStates[NOTE_INDEX].end);
+			expect(note.getTitle()).toBe(NotesStates[NOTE_INDEX].end);
 
-			notes = dataApi.GetNotes();
-			expect(notes[0].GetTitle()).toBe(NotesStates[0].END);
-			expect(notes[1].GetTitle()).toBe(NotesStates[1].END);
-			expect(notes[2].GetTitle()).toBe(NotesStates[2].START);
+			notes = dataApi.getNotes();
+			expect(notes[0].getTitle()).toBe(NotesStates[0].end);
+			expect(notes[1].getTitle()).toBe(NotesStates[1].end);
+			expect(notes[2].getTitle()).toBe(NotesStates[2].start);
 		});
 
 		test("Last note", async () => 
 		{
 			const NOTE_INDEX = 2;
 
-			let notes = dataApi.GetNotes();
+			let notes = dataApi.getNotes();
 			const note = notes[NOTE_INDEX];
 
-			expect(note.GetTitle()).toBe(NotesStates[NOTE_INDEX].START);
-			note.SetTitle(NotesStates[NOTE_INDEX].END);
-			expect(note.GetTitle()).toBe(NotesStates[NOTE_INDEX].END);
+			expect(note.getTitle()).toBe(NotesStates[NOTE_INDEX].start);
+			note.setTitle(NotesStates[NOTE_INDEX].end);
+			expect(note.getTitle()).toBe(NotesStates[NOTE_INDEX].end);
 
-			notes = dataApi.GetNotes();
-			expect(notes[0].GetTitle()).toBe(NotesStates[0].END);
-			expect(notes[1].GetTitle()).toBe(NotesStates[1].END);
-			expect(notes[2].GetTitle()).toBe(NotesStates[2].END);
+			notes = dataApi.getNotes();
+			expect(notes[0].getTitle()).toBe(NotesStates[0].end);
+			expect(notes[1].getTitle()).toBe(NotesStates[1].end);
+			expect(notes[2].getTitle()).toBe(NotesStates[2].end);
 		});
 	});
 
@@ -118,39 +118,39 @@ describe("Frequent cases", () =>
 	{
 		test("Second note", async () => 
 		{
-			const notesBefore = dataApi.GetNotes();
+			const notesBefore = dataApi.getNotes();
 			expect(notesBefore).toHaveLength(3);
 
-			dataApi.DeleteNote(notesBefore[1]);
+			dataApi.deleteNote(notesBefore[1]);
 
-			const notesAfter = dataApi.GetNotes();
+			const notesAfter = dataApi.getNotes();
 			expect(notesAfter).toHaveLength(2);
 
-			expect(notesAfter[0].Id()).toBe(notesBefore[0].Id());
-			expect(notesAfter[1].Id()).toBe(notesBefore[2].Id());
+			expect(notesAfter[0].getId()).toBe(notesBefore[0].getId());
+			expect(notesAfter[1].getId()).toBe(notesBefore[2].getId());
 		});
 
 		test("First note", async () => 
 		{
-			const notesBefore = dataApi.GetNotes();
+			const notesBefore = dataApi.getNotes();
 			expect(notesBefore).toHaveLength(2);
 
-			dataApi.DeleteNote(notesBefore[0]);
+			dataApi.deleteNote(notesBefore[0]);
 
-			const notesAfter = dataApi.GetNotes();
+			const notesAfter = dataApi.getNotes();
 			expect(notesAfter).toHaveLength(1);
 
-			expect(notesAfter[0].Id()).toBe(notesBefore[1].Id());
+			expect(notesAfter[0].getId()).toBe(notesBefore[1].getId());
 		});
 
 		test("Last note", async () => 
 		{
-			const notesBefore = dataApi.GetNotes();
+			const notesBefore = dataApi.getNotes();
 			expect(notesBefore).toHaveLength(1);
 
-			dataApi.DeleteNote(notesBefore[0]);
+			dataApi.deleteNote(notesBefore[0]);
 
-			const notesAfter = dataApi.GetNotes();
+			const notesAfter = dataApi.getNotes();
 			expect(notesAfter).toHaveLength(0);
 		});
 	});
@@ -180,75 +180,75 @@ describe("Tags", () =>
 	{
 		const mockedDataProvier = new MockedDataProvider(JSON.parse(JSON.stringify(fakeData)));
 		dataApi = new DataApiClass(mockedDataProvier);
-		await dataApi.Setup();
-		notes = dataApi.GetNotes();
-		tags = dataApi.GetTags();
+		await dataApi.setup();
+		notes = dataApi.getNotes();
+		tags = dataApi.getTags();
 
-		expect(dataApi.GetNotes()).toHaveLength(3);
-		expect(notes[0].GetTags()).toHaveLength(0);
-		expect(notes[1].GetTags()).toHaveLength(1);
-		expect(notes[2].GetTags()).toHaveLength(2);
+		expect(dataApi.getNotes()).toHaveLength(3);
+		expect(notes[0].getTags()).toHaveLength(0);
+		expect(notes[1].getTags()).toHaveLength(1);
+		expect(notes[2].getTags()).toHaveLength(2);
 	});
 
 	test("Adding the first tag", () => 
 	{
-		dataApi.AddTagToNote(notes[0], tags[0]);
+		dataApi.addTagToNote(notes[0], tags[0]);
 
-		notes = dataApi.GetNotes();
-		expect(notes[0].GetTags()).toHaveLength(1);
+		notes = dataApi.getNotes();
+		expect(notes[0].getTags()).toHaveLength(1);
 	});
 
 	test("Adding the third tag", () => 
 	{
-		dataApi.AddTagToNote(notes[2], tags[2]);
+		dataApi.addTagToNote(notes[2], tags[2]);
 
-		notes = dataApi.GetNotes();
-		expect(notes[2].GetTags()).toHaveLength(3);
+		notes = dataApi.getNotes();
+		expect(notes[2].getTags()).toHaveLength(3);
 	});
 
 	test("Adding tag that already exists on the note does nothing", () => 
 	{
-		dataApi.AddTagToNote(notes[2], tags[0]);
+		dataApi.addTagToNote(notes[2], tags[0]);
 
-		notes = dataApi.GetNotes();
-		expect(notes[2].GetTags()).toHaveLength(2);
+		notes = dataApi.getNotes();
+		expect(notes[2].getTags()).toHaveLength(2);
 	});
 
 	test("Removing the last tag from a note", () => 
 	{
-		dataApi.RemoveTagFromNote(notes[1], tags[0]);
+		dataApi.removeTagFromNote(notes[1], tags[0]);
 
-		notes = dataApi.GetNotes();
-		expect(notes[0].GetTags()).toHaveLength(0);
-		expect(notes[1].GetTags()).toHaveLength(0);
-		expect(notes[2].GetTags()).toHaveLength(2);
+		notes = dataApi.getNotes();
+		expect(notes[0].getTags()).toHaveLength(0);
+		expect(notes[1].getTags()).toHaveLength(0);
+		expect(notes[2].getTags()).toHaveLength(2);
 	});
 
 	test("Removing a tag from a note", () => 
 	{
-		dataApi.RemoveTagFromNote(notes[2], tags[0]);
+		dataApi.removeTagFromNote(notes[2], tags[0]);
 
-		notes = dataApi.GetNotes();
-		expect(notes[0].GetTags()).toHaveLength(0);
-		expect(notes[1].GetTags()).toHaveLength(1);
-		expect(notes[2].GetTags()).toHaveLength(1);
+		notes = dataApi.getNotes();
+		expect(notes[0].getTags()).toHaveLength(0);
+		expect(notes[1].getTags()).toHaveLength(1);
+		expect(notes[2].getTags()).toHaveLength(1);
 	});
 
 	test("Deleting a tag that exists on a single note", () => 
 	{
-		dataApi.DeleteTag(tags[1]);
-		notes = dataApi.GetNotes();
-		expect(notes[0].GetTags()).toHaveLength(0);
-		expect(notes[1].GetTags()).toHaveLength(1);
-		expect(notes[2].GetTags()).toHaveLength(1);
+		dataApi.deleteTag(tags[1]);
+		notes = dataApi.getNotes();
+		expect(notes[0].getTags()).toHaveLength(0);
+		expect(notes[1].getTags()).toHaveLength(1);
+		expect(notes[2].getTags()).toHaveLength(1);
 	});
 
 	test("Deleting a tag that exists on multiple notes", () => 
 	{
-		dataApi.DeleteTag(tags[0]);
-		notes = dataApi.GetNotes();
-		expect(notes[0].GetTags()).toHaveLength(0);
-		expect(notes[1].GetTags()).toHaveLength(0);
-		expect(notes[2].GetTags()).toHaveLength(1);
+		dataApi.deleteTag(tags[0]);
+		notes = dataApi.getNotes();
+		expect(notes[0].getTags()).toHaveLength(0);
+		expect(notes[1].getTags()).toHaveLength(0);
+		expect(notes[2].getTags()).toHaveLength(1);
 	});
 });
