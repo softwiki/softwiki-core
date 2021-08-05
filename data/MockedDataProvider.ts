@@ -11,12 +11,6 @@ export interface ICollections
 	projects: ProjectModel[]
 }
 
-const Collections = {
-	notes: "notes",
-	tags: "tags",
-	projects: "projects"
-};
-
 export default class FakeDataProvider extends DataProvider
 {
 	collections: ICollections = {notes: [], tags: [], projects: []}

@@ -50,7 +50,7 @@ describe("Frequent cases", () =>
 
 	describe("Edit notes", () => 
 	{
-		const NotesStates: any = [
+		const notesStates: any = [
 			{start: "Note 1", end: "Note 1 edited"},
 			{start: "Note 2", end: "Note 2 edited"},
 			{start: "Note 3", end: "Note 3 edited"}
@@ -64,53 +64,53 @@ describe("Frequent cases", () =>
 
 		test("First note", async () => 
 		{
-			const NOTE_INDEX = 0;
+			const nodeIndex = 0;
 
 			let notes = dataApi.getNotes();
-			const note = notes[NOTE_INDEX];
+			const note = notes[nodeIndex];
 
-			expect(note.getTitle()).toBe(NotesStates[NOTE_INDEX].start);
-			note.setTitle(NotesStates[NOTE_INDEX].end);
-			expect(note.getTitle()).toBe(NotesStates[NOTE_INDEX].end);
+			expect(note.getTitle()).toBe(notesStates[nodeIndex].start);
+			note.setTitle(notesStates[nodeIndex].end);
+			expect(note.getTitle()).toBe(notesStates[nodeIndex].end);
 
 			notes = dataApi.getNotes();
-			expect(notes[0].getTitle()).toBe(NotesStates[0].end);
-			expect(notes[1].getTitle()).toBe(NotesStates[1].start);
-			expect(notes[2].getTitle()).toBe(NotesStates[2].start);
+			expect(notes[0].getTitle()).toBe(notesStates[0].end);
+			expect(notes[1].getTitle()).toBe(notesStates[1].start);
+			expect(notes[2].getTitle()).toBe(notesStates[2].start);
 		});
 
 		test("Second note", async () => 
 		{
-			const NOTE_INDEX = 1;
+			const nodeIndex = 1;
 
 			let notes = dataApi.getNotes();
-			const note = notes[NOTE_INDEX];
+			const note = notes[nodeIndex];
 
-			expect(note.getTitle()).toBe(NotesStates[NOTE_INDEX].start);
-			note.setTitle(NotesStates[NOTE_INDEX].end);
-			expect(note.getTitle()).toBe(NotesStates[NOTE_INDEX].end);
+			expect(note.getTitle()).toBe(notesStates[nodeIndex].start);
+			note.setTitle(notesStates[nodeIndex].end);
+			expect(note.getTitle()).toBe(notesStates[nodeIndex].end);
 
 			notes = dataApi.getNotes();
-			expect(notes[0].getTitle()).toBe(NotesStates[0].end);
-			expect(notes[1].getTitle()).toBe(NotesStates[1].end);
-			expect(notes[2].getTitle()).toBe(NotesStates[2].start);
+			expect(notes[0].getTitle()).toBe(notesStates[0].end);
+			expect(notes[1].getTitle()).toBe(notesStates[1].end);
+			expect(notes[2].getTitle()).toBe(notesStates[2].start);
 		});
 
 		test("Last note", async () => 
 		{
-			const NOTE_INDEX = 2;
+			const nodeIndex = 2;
 
 			let notes = dataApi.getNotes();
-			const note = notes[NOTE_INDEX];
+			const note = notes[nodeIndex];
 
-			expect(note.getTitle()).toBe(NotesStates[NOTE_INDEX].start);
-			note.setTitle(NotesStates[NOTE_INDEX].end);
-			expect(note.getTitle()).toBe(NotesStates[NOTE_INDEX].end);
+			expect(note.getTitle()).toBe(notesStates[nodeIndex].start);
+			note.setTitle(notesStates[nodeIndex].end);
+			expect(note.getTitle()).toBe(notesStates[nodeIndex].end);
 
 			notes = dataApi.getNotes();
-			expect(notes[0].getTitle()).toBe(NotesStates[0].end);
-			expect(notes[1].getTitle()).toBe(NotesStates[1].end);
-			expect(notes[2].getTitle()).toBe(NotesStates[2].end);
+			expect(notes[0].getTitle()).toBe(notesStates[0].end);
+			expect(notes[1].getTitle()).toBe(notesStates[1].end);
+			expect(notes[2].getTitle()).toBe(notesStates[2].end);
 		});
 	});
 
