@@ -1,7 +1,7 @@
 import { NoteModel, Tag, TagModel, TagProperties, NoteProperties } from "../models";
 import DataProvider from "./DataProvider";
 
-import { writeFile, readFile } from "../Files";
+import { writeFile, readFile } from "../files";
 import { ProjectModel, ProjectProperties } from "../models/Project";
 
 interface ICollections
