@@ -1,4 +1,7 @@
-import { isBrowser } from "./utils";
+import { fstat } from "fs";
+import { isBrowser, isLinux, isWindows } from "./utils";
+const { app } = window.require("@electron/remote");
+const fs = window.require("fs");
 
 export async function readFile(path: string): Promise<string>
 {
@@ -33,4 +36,25 @@ export async function writeFile(path: string, content: string): Promise<void>
 		console.log(e);
 		throw e;
 	}
+}
+
+export function getDefaultBasePath(): string
+{
+	let defaultPath = "";
+
+	if (isLinux())
+	{
+		defaultPath = app.getPath("home") + "/.softwiki";
+	}
+	else if (isWindows())
+	{
+		return app.getPath("userData");
+	}
+
+	if (!fs.existsSync(defaultPath))
+	{
+		fs.mkdirSync(defaultPath, {recursive: true});
+	}
+
+	return defaultPath;
 }

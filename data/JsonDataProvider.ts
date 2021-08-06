@@ -18,13 +18,16 @@ const COLLECTION_PROJECTS = "projects";
 
 export default class JsonDataProvider extends DataProvider
 {
-	collections: ICollections
+	private _collections: ICollections
+	private _dbPath: string
 
-	constructor()
+	constructor(dbPath: string)
 	{
 		super();
 
-		this.collections = {
+		this._dbPath = dbPath;
+
+		this._collections = {
 			notes: [],
 			tags: [],
 			projects: []
@@ -35,8 +38,8 @@ export default class JsonDataProvider extends DataProvider
 	{
 		try
 		{
-			const data = await readFile("db.json");
-			this.collections = JSON.parse(data)	;
+			const data = await readFile(this._dbPath);
+			this._collections = JSON.parse(data);
 		}
 		catch (e)
 		{
@@ -194,7 +197,7 @@ export default class JsonDataProvider extends DataProvider
 
 	private _getCollection<T>(collectionName: string): T[]
 	{
-		const collection = this.collections[collectionName];
+		const collection = this._collections[collectionName];
 		return collection as unknown as T[];
 	}
 
@@ -211,6 +214,6 @@ export default class JsonDataProvider extends DataProvider
 
 	private async _writeDB(): Promise<void>
 	{
-		await writeFile("db.json", JSON.stringify(this.collections, null, 4));
+		await writeFile(this._dbPath, JSON.stringify(this._collections, null, 4));
 	}
 }

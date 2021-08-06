@@ -4,6 +4,7 @@ import DataProvider from "./DataProvider";
 import JsonDataProvider from "./JsonDataProvider";
 import Event from "../services/EventService";
 import { Project, ProjectModel, ProjectProperties } from "../models/Project";
+import { getDefaultBasePath } from "softwiki-core/files";
 
 export enum DataEvent
 {
@@ -202,4 +203,4 @@ export class DataApiClass
 	}
 }
 
-export default new DataApiClass(new JsonDataProvider());
+export default new DataApiClass(new JsonDataProvider(getDefaultBasePath() + "/db.json"));
