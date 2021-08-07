@@ -1,4 +1,4 @@
-export default class Queue
+export default class QueueService
 {
 	queue:  (() => Promise<void>)[]
 

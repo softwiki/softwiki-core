@@ -1,4 +1,4 @@
-import { Tag } from "./Tags";
+import { Tag } from "./Tag";
 import { SoftWikiApi } from "../SoftWikiApi";
 import { Project } from "./Project";
 

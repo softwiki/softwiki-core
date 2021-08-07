@@ -1,5 +1,5 @@
 import { SoftWikiApi } from "../SoftWikiApi";
-import { ObjectReference } from "./Notes";
+import { ObjectReference } from "./Note";
 
 export interface TagProperties
 {

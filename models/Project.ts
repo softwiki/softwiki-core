@@ -1,5 +1,5 @@
 import { SoftWikiApi } from "../SoftWikiApi";
-import { Note, ObjectReference } from "./Notes";
+import { Note, ObjectReference } from "./Note";
 
 export interface ProjectProperties
 {

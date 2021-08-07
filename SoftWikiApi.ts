@@ -1,8 +1,9 @@
-import Queue from "./Queue";
-import { Note, NoteModel, NoteProperties, Tag, TagModel, TagProperties } from "./models";
-import Provider from "./providers/Provider";
-import EventService from "./services/EventService";
-import { Project, ProjectModel, ProjectProperties } from "./models/Project";
+import { Note, NoteModel, NoteProperties } from "./models";
+import { Tag, TagModel, TagProperties } from "./models";
+import { Project, ProjectModel, ProjectProperties } from "./models";
+
+import { Provider } from "./providers";
+import { EventService, QueueService } from "./services";
 
 export enum DataEvent
 {
@@ -22,13 +23,13 @@ export class SoftWikiApi
 	private _cache: {notes: NoteModel[], tags: TagModel[], projects: ProjectModel[]}
 		= {notes: [], tags: [], projects: []}
 
-	private _queue: Queue
+	private _queue: QueueService
 	private _events: EventService
 	private _dataProvider
 
 	constructor(args: SoftWikiApiParameters)
 	{
-		this._queue = new Queue();
+		this._queue = new QueueService();
 		this._dataProvider = args.provider;
 		this._events = new EventService();
 	}
