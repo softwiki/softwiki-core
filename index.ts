@@ -1,1 +1,2 @@
-export * from "./files";
+export * from "./SoftWikiApi";
+export * from "./providers";

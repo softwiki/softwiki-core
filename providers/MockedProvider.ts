@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-unused-vars: off */
 
 import { NoteModel, Tag, TagModel, TagProperties, NoteProperties } from "../models";
-import DataProvider from "./DataProvider";
+import Provider from "./Provider";
 import { ProjectModel, ProjectProperties } from "../models/Project";
 
 export interface ICollections
@@ -11,7 +11,7 @@ export interface ICollections
 	projects: ProjectModel[]
 }
 
-export default class FakeDataProvider extends DataProvider
+export default class FakeDataProvider extends Provider
 {
 	collections: ICollections = {notes: [], tags: [], projects: []}
 

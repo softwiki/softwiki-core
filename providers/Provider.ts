@@ -1,7 +1,7 @@
 import { NoteModel, Tag, TagModel, TagProperties, NoteProperties } from "../models";
 import { ProjectModel, ProjectProperties } from "../models/Project";
 
-export default abstract class DataProvider
+export default abstract class Provider
 {
 	public abstract setup(): Promise<void>
 

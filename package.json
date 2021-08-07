@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "eslint . && jest",
+    "test": "jest",
+    "lint-style": "eslint .",
     "test-watch": "eslint . && jest --watch"
   },
   "author": "",

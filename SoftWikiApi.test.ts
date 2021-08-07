@@ -1,12 +1,12 @@
-import { Note, Tag } from "../models";
-import { DataApiClass } from "./DataApi";
-import DataProvider from "./DataProvider";
-import MockedDataProvider, {ICollections} from "./MockedDataProvider";
+import { Note, Tag } from "./models";
+import { SoftWikiApi } from "./SoftWikiApi";
+import Provider from "./providers/Provider";
+import MockedDataProvider, {ICollections} from "./providers/MockedProvider";
 
 describe("Frequent cases", () => 
 {
-	const mockedDataProvider: DataProvider = new MockedDataProvider({notes: [], tags: [], projects: []});
-	const dataApi = new DataApiClass(mockedDataProvider);
+	const mockedDataProvider: Provider = new MockedDataProvider({notes: [], tags: [], projects: []});
+	const dataApi = new SoftWikiApi({provider: mockedDataProvider});
 
 	describe("First note ever", () => 
 	{
@@ -172,14 +172,14 @@ describe("Tags", () =>
 		projects: []
 	};
 
-	let dataApi: DataApiClass;
+	let dataApi: SoftWikiApi;
 	let notes: Note[];
 	let tags: Tag[];
 
 	beforeEach(async () => 
 	{
 		const mockedDataProvier = new MockedDataProvider(JSON.parse(JSON.stringify(fakeData)));
-		dataApi = new DataApiClass(mockedDataProvier);
+		dataApi = new SoftWikiApi({provider: mockedDataProvier});
 		await dataApi.setup();
 		notes = dataApi.getNotes();
 		tags = dataApi.getTags();

@@ -1,4 +1,4 @@
-import DataApi from "../data/DataApi";
+import { SoftWikiApi } from "../SoftWikiApi";
 import { Note, ObjectReference } from "./Notes";
 
 export interface ProjectProperties
@@ -12,8 +12,9 @@ export class Project
 {
 	private _properties: ProjectProperties
 	private _objectRef: ObjectReference
+	private _api: SoftWikiApi
 
-	constructor(properties: ProjectModel)
+	constructor(properties: ProjectModel, api: SoftWikiApi)
 	{
 		this._properties = {
 			name: properties.name
@@ -23,12 +24,14 @@ export class Project
 			id: properties.id,
 			custom: properties.custom
 		};
+
+		this._api = api;
 	}
 
 	public setName(name: string): void
 	{
 		this._properties.name = name;
-		DataApi.updateProject(this);
+		this._api.updateProject(this);
 	}
 
 	public getName(): string
@@ -39,7 +42,7 @@ export class Project
 	public getNoteCount(): number // [TODO] Optimize or find another way
 	{
 		let count = 0;
-		const notes = DataApi.getNotes();
+		const notes = this._api.getNotes();
 		notes.forEach((note: Note) => 
 		{
 			if (note.hasProject(this))
@@ -55,7 +58,7 @@ export class Project
 
 	public delete(): void
 	{
-		DataApi.deleteProject(this);
+		this._api.deleteProject(this);
 	}
 
 	public getModel(): ProjectModel

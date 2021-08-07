@@ -1,4 +1,4 @@
-import DataApi from "../data/DataApi";
+import { SoftWikiApi } from "../SoftWikiApi";
 import { ObjectReference } from "./Notes";
 
 export interface TagProperties
@@ -21,10 +21,11 @@ export class Tag
 {
 	private _properties: TagProperties
 	private _objectRef: ObjectReference
+	private _api: SoftWikiApi
 	
 	public isDeleted = false
 
-	constructor(properties: TagModel)
+	constructor(properties: TagModel, api: SoftWikiApi)
 	{
 		this._properties = {
 			name: properties.name,
@@ -35,25 +36,27 @@ export class Tag
 			id: properties.id,
 			custom: properties.custom
 		};
+
+		this._api = api;
 	}
 
 	public setName(name: string): void
 	{
 		this._properties.name = name;
-		DataApi.updateTag(this);
+		this._api.updateTag(this);
 	}
 
 	public setColor(color: Color): void
 	{
 		this._properties.color = color;
-		DataApi.updateTag(this);
+		this._api.updateTag(this);
 	}
 
 	public setAll(properties: TagProperties): void
 	{
 		this._properties.name = properties.name;
 		this._properties.color = properties.color;
-		DataApi.updateTag(this);
+		this._api.updateTag(this);
 	}
 
 	public getName(): string 
@@ -78,7 +81,7 @@ export class Tag
 
 	public delete(): void
 	{
-		DataApi.deleteTag(this);
+		this._api.deleteTag(this);
 		this.isDeleted = true;
 	}
 

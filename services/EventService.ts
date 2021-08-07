@@ -5,7 +5,7 @@ interface EventInfo
 	handler: (args: unknown) => void
 }
 
-export class EventService
+export default class EventService
 {
 	private _events: {[name: string]: EventInfo[]} = {}
 	private _eventsExistance: {[id: string]: EventInfo} = {}
@@ -40,5 +40,3 @@ export class EventService
 		});
 	}
 }
-
-export default new EventService();
