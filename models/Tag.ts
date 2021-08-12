@@ -1,7 +1,8 @@
-import { SoftWikiApi } from "../SoftWikiApi";
-import { ObjectReference } from "./Note";
+import { ApiTag } from "../api-providers/Api";
+import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
+import { Base } from "./Base";
 
-export interface TagProperties
+export interface TagData
 {
 	name: string
 	color: Color
@@ -15,58 +16,46 @@ export interface Color
 	a?: number | undefined
 }
 
-export interface TagModel extends TagProperties, ObjectReference {}
-
-export class Tag
+export class Tag extends Base
 {
-	private _properties: TagProperties
-	private _objectRef: ObjectReference
-	private _api: SoftWikiApi
-	
-	public isDeleted = false
+	private _data: TagData
 
-	constructor(properties: TagModel, api: SoftWikiApi)
+	constructor(data: ApiTag, client: SoftWikiClient)
 	{
-		this._properties = {
-			name: properties.name,
-			color: properties.color
-		};
-
-		this._objectRef = {
-			id: properties.id,
-			custom: properties.custom
-		};
-
-		this._api = api;
+		super(data.id, client);
+		this._data = data;
 	}
 
-	public setName(name: string): void
+	public async setName(name: string): Promise<void>
 	{
-		this._properties.name = name;
-		this._api.updateTag(this);
+		await this._api.updateTag(this._id, {...this._data, name});
+		this._data.name = name;
+		this._client.run(DataEvent.TagsUpdated, {tag: this});
 	}
 
-	public setColor(color: Color): void
+	public async setColor(color: Color): Promise<void>
 	{
-		this._properties.color = color;
-		this._api.updateTag(this);
+		await this._api.updateTag(this._id, {...this._data, color});
+		this._data.color = color;
+		this._client.run(DataEvent.TagsUpdated, {tag: this});
 	}
 
-	public setAll(properties: TagProperties): void
+	public async setAll(properties: TagData): Promise<void>
 	{
-		this._properties.name = properties.name;
-		this._properties.color = properties.color;
-		this._api.updateTag(this);
+		await this._api.updateTag(this._id, {...this._data, ...properties});
+		this._data.name = properties.name;
+		this._data.color = properties.color;
+		this._client.run(DataEvent.TagsUpdated, {tag: this});
 	}
 
 	public getName(): string 
 	{
-		return this._properties.name; 
+		return this._data.name; 
 	}
 
 	public getColor(): Color 
 	{
-		return this._properties.color; 
+		return this._data.color; 
 	}
 
 	public getColorAsCss(): string 
@@ -74,19 +63,10 @@ export class Tag
 		return `rgb(${this.getColor().r}, ${this.getColor().g}, ${this.getColor().b})`; 
 	}
 
-	public getId(): string 
+	public async delete(): Promise<void>
 	{
-		return this._objectRef.id; 
-	}
-
-	public delete(): void
-	{
-		this._api.deleteTag(this);
-		this.isDeleted = true;
-	}
-
-	public getModel(): TagModel
-	{
-		return {...this._properties, ...this._objectRef};
+		await this._api.deleteTag(this.getId());
+		delete this._client.cache.tags[this._id];
+		this._client.run(DataEvent.TagsUpdated, {tag: this});
 	}
 }

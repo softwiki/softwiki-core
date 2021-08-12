@@ -1,14 +1,10 @@
 import { Tag } from "./Tag";
-import { SoftWikiApi } from "../SoftWikiApi";
+import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
 import { Project } from "./Project";
+import { ApiNote } from "../api-providers/Api";
+import { Base } from "./Base";
 
-export interface ObjectReference
-{
-	id: string
-	custom: any
-}
-
-export interface NoteProperties
+export interface NoteData
 {
 	title: string
 	content: string
@@ -16,123 +12,96 @@ export interface NoteProperties
 	project: string | undefined
 }
 
-export interface NoteModel extends NoteProperties, ObjectReference {}
-
-export class Note
+export class Note extends Base
 {
-	private _properties: NoteProperties
-	private _objectRef: ObjectReference
-	private _api: SoftWikiApi
-	
-	public isDeleted = false;
+	private _data: NoteData
 
-	constructor(properties: NoteModel, api: SoftWikiApi)
+	constructor(data: ApiNote, client: SoftWikiClient)
 	{
-		this._properties = {
-			title: properties.title,
-			content: properties.content,
-			tags: properties.tags,
-			project: properties.project
-		};
-
-		this._objectRef = {
-			id: properties.id,
-			custom: properties.custom
-		};
-
-		this._api = api;
+		super(data.id, client);
+		this._data = {title: data.title, content: data.content, tags: [...data.tags], project: data.project};
 	}
 
-	public setTitle(title: string): void
+	public async setTitle(title: string): Promise<void>
 	{
-		if (this._properties.title === title)
-			return;
-		this._properties.title = title;
-		this._api.updateNote(this);
+		await this._api.updateNote(this._id, {...this._data, title});
+		this._data.title = title;
+		this._client.run(DataEvent.NotesUpdated, {note: this});
 	}
 
-	public setContent(content: string): void
+	public async setContent(content: string): Promise<void>
 	{
-		if (this._properties.content === content)
-			return;
-		this._properties.content = content;
-		this._api.updateNote(this);
+		await this._api.updateNote(this._id, {...this._data, content});
+		this._data.content = content;
+		this._client.run(DataEvent.NotesUpdated, {note: this});
 	}
 	
-	public setProject(project: Project | null): void
+	public async setProject(project: Project | null): Promise<void>
 	{
-		this._properties.project = project ? project.getId() : undefined;
-		this._api.updateNote(this);
+		await this._api.updateNote(this._id, {...this._data, project: project ? project.getId() : undefined});
+		this._data.project = project !== null ? project.getId() : undefined;
+		this._client.run(DataEvent.NotesUpdated, {note: this});
 	}
 
-	public addTag(tag: Tag): Note
+	public async addTag(tag: Tag): Promise<void>
 	{
-		const updatedNote = this._api.addTagToNote(this, tag);
-		return updatedNote;
+		if (this._data.tags.indexOf(tag.getId()) !== -1)
+			return ;
+		await this._api.addTagToNote(this._id, tag.getId());
+		this._data.tags.push(tag.getId());
+		this._client.run(DataEvent.NotesUpdated, {note: this});
 	}
 
-	public removeTag(tag: Tag): Note
+	public async removeTag(tag: Tag): Promise<void>
 	{
-		const updatedNote = this._api.removeTagFromNote(this, tag);
-		return updatedNote;
+		const index = this._data.tags.indexOf(tag.getId());
+		if (index === -1)
+			return ;
+		await this._api.removeTagFromNote(this._id, tag.getId());
+		this._data.tags.splice(index, 1);
+		this._client.run(DataEvent.NotesUpdated, {note: this});
 	}
 
 	public getTitle(): string
 	{
-		return this._properties.title;
+		return this._data.title;
 	}
 	
 	public getContent(): string 
 	{
-		return this._properties.content;
-	}
-
-	public getId(): string 
-	{
-		return this._objectRef.id; 
+		return this._data.content;
 	}
 
 	public getTags(): Tag[]
 	{
-		const tags = this._api.getTags();
-
-		const tagsObject: Tag[] = [];
-		tags.forEach((tag: Tag) =>
-		{
-			if (this._properties.tags.indexOf(tag.getId()) !== -1)
-				tagsObject.push(tag);
-		});
-		return tagsObject;
+		return this._data.tags.map((tagId: string) => this._client.cache.tags[tagId]).filter((tag: Tag) => tag !== undefined);
 	}
 
-	public hasProject(project: Project): boolean
+	public belongToProject(project: Project): boolean
 	{
-		return this._properties.project !== undefined && this._properties.project === project.getId();
+		return project.getId() == this._data.project;
 	}
 
 	public getProject(): Project | undefined
 	{
-		const projects = this._api.getProjects();
-		const project = projects.find((project: Project) => 
-		{
-			return project.getId() === this._properties.project; 
-		});
-		return project;
+		if (this._data.project)
+			return this._client.cache.projects[this._data.project];
 	}
 
 	public hasTag(tag: Tag): boolean
 	{
-		return this._properties.tags.indexOf(tag.getId()) !== -1;
+		return this._data.tags.indexOf(tag.getId()) !== -1;
 	}
 
-	public delete(): void
+	public async delete(): Promise<void>
 	{
-		this._api.deleteNote(this);
-		this.isDeleted = true;
+		await this._api.deleteNote(this.getId());
+		delete this._client.cache.notes[this._id];
+		this._client.run(DataEvent.NotesUpdated, {note: this});
 	}
-
-	public getModel(): NoteModel
+	
+	public getDataCopy(): NoteData
 	{
-		return {...this._properties, ...this._objectRef};
+		return JSON.parse(JSON.stringify(this._data));
 	}
 }

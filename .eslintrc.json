@@ -27,7 +27,8 @@
         ],
         "quotes": [
             "error",
-            "double"
+            "double",
+            {"allowTemplateLiterals": true}
         ],
         "semi": [
             "error",
@@ -52,6 +53,12 @@
             {
                 "selector": ["property", "parameterProperty", "method", "accessor"],
                 "modifiers": ["private"],
+                "format": ["camelCase"],
+                "leadingUnderscore": "require"
+            },
+            {
+                "selector": ["property", "parameterProperty", "method", "accessor"],
+                "modifiers": ["protected"],
                 "format": ["camelCase"],
                 "leadingUnderscore": "require"
             },

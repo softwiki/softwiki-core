@@ -1,68 +1,57 @@
-import { SoftWikiApi } from "../SoftWikiApi";
-import { Note, ObjectReference } from "./Note";
+import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
+import { ApiProject } from "../api-providers/Api";
+import { Note } from "./Note";
+import { Base } from "./Base";
 
-export interface ProjectProperties
+export interface ProjectData
 {
 	name: string
 }
 
-export interface ProjectModel extends ProjectProperties, ObjectReference {}
-
-export class Project
+export class Project extends Base
 {
-	private _properties: ProjectProperties
-	private _objectRef: ObjectReference
-	private _api: SoftWikiApi
+	private _data: ProjectData
 
-	constructor(properties: ProjectModel, api: SoftWikiApi)
+	constructor(data: ApiProject, client: SoftWikiClient)
 	{
-		this._properties = {
-			name: properties.name
-		};
-
-		this._objectRef = {
-			id: properties.id,
-			custom: properties.custom
-		};
-
-		this._api = api;
+		super(data.id, client);
+		this._data = data;
 	}
 
-	public setName(name: string): void
+	public async setName(name: string): Promise<void>
 	{
-		this._properties.name = name;
-		this._api.updateProject(this);
+		await this._api.updateProject(this._id, {...this._data, name});
+		this._data.name = name;
+		this._client.run(DataEvent.ProjectsUpdated, {project: this});
 	}
 
 	public getName(): string
 	{
-		return this._properties.name;
+		return this._data.name;
 	}
 
-	public getNoteCount(): number // [TODO] Optimize or find another way
+	public getNoteCount(): number
 	{
-		let count = 0;
-		const notes = this._api.getNotes();
-		notes.forEach((note: Note) => 
+		return this.getNotes().length;
+	}
+
+	public getNotes(): Note[]
+	{
+		return Object.values(this._client.cache.notes).filter((note: Note) => 
 		{
-			if (note.hasProject(this))
-				count++;
+			return note.belongToProject(this);
 		});
-		return count;
 	}
 
-	public getId(): string 
+	public async delete(): Promise<void>
 	{
-		return this._objectRef.id; 
+		await this._api.deleteProject(this.getId());
+		delete this._client.cache.projects[this._id];
+		this._client.run(DataEvent.ProjectsUpdated, {project: this});
 	}
-
-	public delete(): void
+	
+	public getDataCopy(): ProjectData
 	{
-		this._api.deleteProject(this);
-	}
-
-	public getModel(): ProjectModel
-	{
-		return {...this._properties, ...this._objectRef};
+		return JSON.parse(JSON.stringify(this._data));
 	}
 }

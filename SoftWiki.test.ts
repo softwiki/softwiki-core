@@ -1,12 +1,17 @@
 import { Note, Tag } from "./models";
-import { SoftWikiApi } from "./SoftWikiApi";
-import Provider from "./providers/Provider";
-import MockedDataProvider, {ICollections} from "./providers/MockedProvider";
+import { SoftWikiClient } from "./SoftWikiClient";
+import { Api } from "./api-providers";
+import MockedDataProvider, {ICollections} from "./api-providers/MockedProvider";
 
 describe("Frequent cases", () => 
 {
-	const mockedDataProvider: Provider = new MockedDataProvider({notes: [], tags: [], projects: []});
-	const dataApi = new SoftWikiApi({provider: mockedDataProvider});
+	const mockedDataProvider: Api = new MockedDataProvider({notes: [], tags: [], projects: []});
+	const dataApi = new SoftWikiClient({provider: mockedDataProvider});
+
+	beforeAll(async () =>
+	{
+		await dataApi.init();
+	});
 
 	describe("First note ever", () => 
 	{
@@ -14,7 +19,7 @@ describe("Frequent cases", () =>
 	
 		test("Notes list is empty", () => 
 		{
-			notes = dataApi.getNotes();
+			notes = dataApi.notes;
 			expect(notes).toHaveLength(0);
 		});
 	
@@ -26,7 +31,7 @@ describe("Frequent cases", () =>
 	
 		test("Note list have 1 element", () => 
 		{
-			notes = dataApi.getNotes();
+			notes = dataApi.notes;
 			expect(notes).toHaveLength(1);
 		});
 	});
@@ -35,16 +40,16 @@ describe("Frequent cases", () =>
 	{
 		test("Second note", async () => 
 		{
-			expect(dataApi.getNotes()).toHaveLength(1);
+			expect(dataApi.notes).toHaveLength(1);
 			await dataApi.createNote({title: "Note 2", content: "test", tags: [], project: undefined});
-			expect(dataApi.getNotes()).toHaveLength(2);
+			expect(dataApi.notes).toHaveLength(2);
 		});
 
 		test("Third note", async () => 
 		{
-			expect(dataApi.getNotes()).toHaveLength(2);
+			expect(dataApi.notes).toHaveLength(2);
 			await dataApi.createNote({title: "Note 3", content: "test", tags: [], project: undefined});
-			expect(dataApi.getNotes()).toHaveLength(3);
+			expect(dataApi.notes).toHaveLength(3);
 		});
 	});
 
@@ -58,7 +63,7 @@ describe("Frequent cases", () =>
 
 		beforeEach(() => 
 		{
-			const notes = dataApi.getNotes();
+			const notes = dataApi.notes;
 			expect(notes).toHaveLength(3);
 		});
 
@@ -66,14 +71,14 @@ describe("Frequent cases", () =>
 		{
 			const nodeIndex = 0;
 
-			let notes = dataApi.getNotes();
+			let notes = dataApi.notes;
 			const note = notes[nodeIndex];
 
 			expect(note.getTitle()).toBe(notesStates[nodeIndex].start);
-			note.setTitle(notesStates[nodeIndex].end);
+			await note.setTitle(notesStates[nodeIndex].end);
 			expect(note.getTitle()).toBe(notesStates[nodeIndex].end);
 
-			notes = dataApi.getNotes();
+			notes = dataApi.notes;
 			expect(notes[0].getTitle()).toBe(notesStates[0].end);
 			expect(notes[1].getTitle()).toBe(notesStates[1].start);
 			expect(notes[2].getTitle()).toBe(notesStates[2].start);
@@ -83,14 +88,14 @@ describe("Frequent cases", () =>
 		{
 			const nodeIndex = 1;
 
-			let notes = dataApi.getNotes();
+			let notes = dataApi.notes;
 			const note = notes[nodeIndex];
 
 			expect(note.getTitle()).toBe(notesStates[nodeIndex].start);
-			note.setTitle(notesStates[nodeIndex].end);
+			await note.setTitle(notesStates[nodeIndex].end);
 			expect(note.getTitle()).toBe(notesStates[nodeIndex].end);
 
-			notes = dataApi.getNotes();
+			notes = dataApi.notes;
 			expect(notes[0].getTitle()).toBe(notesStates[0].end);
 			expect(notes[1].getTitle()).toBe(notesStates[1].end);
 			expect(notes[2].getTitle()).toBe(notesStates[2].start);
@@ -100,14 +105,14 @@ describe("Frequent cases", () =>
 		{
 			const nodeIndex = 2;
 
-			let notes = dataApi.getNotes();
+			let notes = dataApi.notes;
 			const note = notes[nodeIndex];
 
 			expect(note.getTitle()).toBe(notesStates[nodeIndex].start);
-			note.setTitle(notesStates[nodeIndex].end);
+			await note.setTitle(notesStates[nodeIndex].end);
 			expect(note.getTitle()).toBe(notesStates[nodeIndex].end);
 
-			notes = dataApi.getNotes();
+			notes = dataApi.notes;
 			expect(notes[0].getTitle()).toBe(notesStates[0].end);
 			expect(notes[1].getTitle()).toBe(notesStates[1].end);
 			expect(notes[2].getTitle()).toBe(notesStates[2].end);
@@ -118,12 +123,12 @@ describe("Frequent cases", () =>
 	{
 		test("Second note", async () => 
 		{
-			const notesBefore = dataApi.getNotes();
+			const notesBefore = dataApi.notes;
 			expect(notesBefore).toHaveLength(3);
 
-			dataApi.deleteNote(notesBefore[1]);
+			await notesBefore[1].delete();
 
-			const notesAfter = dataApi.getNotes();
+			const notesAfter = dataApi.notes;
 			expect(notesAfter).toHaveLength(2);
 
 			expect(notesAfter[0].getId()).toBe(notesBefore[0].getId());
@@ -132,12 +137,12 @@ describe("Frequent cases", () =>
 
 		test("First note", async () => 
 		{
-			const notesBefore = dataApi.getNotes();
+			const notesBefore = dataApi.notes;
 			expect(notesBefore).toHaveLength(2);
 
-			dataApi.deleteNote(notesBefore[0]);
+			await notesBefore[0].delete();
 
-			const notesAfter = dataApi.getNotes();
+			const notesAfter = dataApi.notes;
 			expect(notesAfter).toHaveLength(1);
 
 			expect(notesAfter[0].getId()).toBe(notesBefore[1].getId());
@@ -145,12 +150,12 @@ describe("Frequent cases", () =>
 
 		test("Last note", async () => 
 		{
-			const notesBefore = dataApi.getNotes();
+			const notesBefore = dataApi.notes;
 			expect(notesBefore).toHaveLength(1);
 
-			dataApi.deleteNote(notesBefore[0]);
+			await notesBefore[0].delete();
 
-			const notesAfter = dataApi.getNotes();
+			const notesAfter = dataApi.notes;
 			expect(notesAfter).toHaveLength(0);
 		});
 	});
@@ -160,93 +165,93 @@ describe("Tags", () =>
 {
 	const fakeData: ICollections = {
 		notes: [
-			{title: "First note", content: "Amazing content", tags: [], id: "1", project: undefined, custom: null},
-			{title: "Second note", content: "Amazing content", tags: ["1"], id: "2", project: undefined, custom: null},
-			{title: "Third note", content: "Amazing content", tags: ["1", "2"], id: "3", project: undefined, custom: null}
+			{title: "First note", content: "Amazing content", tags: [], id: "1", project: undefined},
+			{title: "Second note", content: "Amazing content", tags: ["1"], id: "2", project: undefined},
+			{title: "Third note", content: "Amazing content", tags: ["1", "2"], id: "3", project: undefined}
 		],
 		tags: [
-			{name: "First tag", color: {r: 20, g: 20, b: 20, a: 1}, id: "1", custom: null},
-			{name: "Second tag", color: {r: 20, g: 20, b: 20, a: 1}, id: "2", custom: null},
-			{name: "Third tag", color: {r: 20, g: 20, b: 20, a: 1}, id: "3", custom: null}
+			{name: "First tag", color: {r: 20, g: 20, b: 20, a: 1}, id: "1"},
+			{name: "Second tag", color: {r: 20, g: 20, b: 20, a: 1}, id: "2"},
+			{name: "Third tag", color: {r: 20, g: 20, b: 20, a: 1}, id: "3"}
 		],
 		projects: []
 	};
 
-	let dataApi: SoftWikiApi;
+	let dataApi: SoftWikiClient;
 	let notes: Note[];
 	let tags: Tag[];
 
 	beforeEach(async () => 
 	{
 		const mockedDataProvier = new MockedDataProvider(JSON.parse(JSON.stringify(fakeData)));
-		dataApi = new SoftWikiApi({provider: mockedDataProvier});
-		await dataApi.setup();
-		notes = dataApi.getNotes();
-		tags = dataApi.getTags();
+		dataApi = new SoftWikiClient({provider: mockedDataProvier});
+		await dataApi.init();
+		notes = dataApi.notes;
+		tags = dataApi.tags;
 
-		expect(dataApi.getNotes()).toHaveLength(3);
+		expect(dataApi.notes).toHaveLength(3);
 		expect(notes[0].getTags()).toHaveLength(0);
 		expect(notes[1].getTags()).toHaveLength(1);
 		expect(notes[2].getTags()).toHaveLength(2);
 	});
 
-	test("Adding the first tag", () => 
+	test("Adding the first tag", async () => 
 	{
-		dataApi.addTagToNote(notes[0], tags[0]);
+		await notes[0].addTag(tags[0]);
 
-		notes = dataApi.getNotes();
+		notes = dataApi.notes;
 		expect(notes[0].getTags()).toHaveLength(1);
 	});
 
-	test("Adding the third tag", () => 
+	test("Adding the third tag", async () => 
 	{
-		dataApi.addTagToNote(notes[2], tags[2]);
+		await notes[2].addTag(tags[2]);
 
-		notes = dataApi.getNotes();
+		notes = dataApi.notes;
 		expect(notes[2].getTags()).toHaveLength(3);
 	});
 
-	test("Adding tag that already exists on the note does nothing", () => 
+	test("Adding tag that already exists on the note does nothing", async () => 
 	{
-		dataApi.addTagToNote(notes[2], tags[0]);
+		await notes[2].addTag(tags[0]);
 
-		notes = dataApi.getNotes();
+		notes = dataApi.notes;
 		expect(notes[2].getTags()).toHaveLength(2);
 	});
 
-	test("Removing the last tag from a note", () => 
+	test("Removing the last tag from a note", async () => 
 	{
-		dataApi.removeTagFromNote(notes[1], tags[0]);
+		await notes[1].removeTag(tags[0]);
 
-		notes = dataApi.getNotes();
+		notes = dataApi.notes;
 		expect(notes[0].getTags()).toHaveLength(0);
 		expect(notes[1].getTags()).toHaveLength(0);
 		expect(notes[2].getTags()).toHaveLength(2);
 	});
 
-	test("Removing a tag from a note", () => 
+	test("Removing a tag from a note", async () => 
 	{
-		dataApi.removeTagFromNote(notes[2], tags[0]);
+		await notes[2].removeTag(tags[0]);
 
-		notes = dataApi.getNotes();
+		notes = dataApi.notes;
 		expect(notes[0].getTags()).toHaveLength(0);
 		expect(notes[1].getTags()).toHaveLength(1);
 		expect(notes[2].getTags()).toHaveLength(1);
 	});
 
-	test("Deleting a tag that exists on a single note", () => 
+	test("Deleting a tag that exists on a single note", async () => 
 	{
-		dataApi.deleteTag(tags[1]);
-		notes = dataApi.getNotes();
+		await tags[1].delete();
+		notes = dataApi.notes;
 		expect(notes[0].getTags()).toHaveLength(0);
 		expect(notes[1].getTags()).toHaveLength(1);
 		expect(notes[2].getTags()).toHaveLength(1);
 	});
 
-	test("Deleting a tag that exists on multiple notes", () => 
+	test("Deleting a tag that exists on multiple notes", async () => 
 	{
-		dataApi.deleteTag(tags[0]);
-		notes = dataApi.getNotes();
+		await tags[0].delete();
+		notes = dataApi.notes;
 		expect(notes[0].getTags()).toHaveLength(0);
 		expect(notes[1].getTags()).toHaveLength(0);
 		expect(notes[2].getTags()).toHaveLength(1);
