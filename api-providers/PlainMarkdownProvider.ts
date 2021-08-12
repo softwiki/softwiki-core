@@ -1,4 +1,4 @@
-import { generateMarkdownWithMetadata, parseMarkdownMetadata } from "softwiki-core/utils/markdown";
+import { generateMarkdownWithMetadata, parseMarkdownMetadata } from "../utils/markdown";
 import { SoftWikiError } from "../errors";
 import { NoteData, TagData, ProjectData, Tag } from "../models";
 import Api, {ApiNote, ApiProject, ApiTag} from "./Api";

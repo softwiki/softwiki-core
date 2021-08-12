@@ -1,4 +1,4 @@
-import SoftWikiClient from "softwiki-core/SoftWikiClient";
+import SoftWikiClient from "../SoftWikiClient";
 import { TagData as TagData, NoteData as NoteData} from "../models";
 import { ProjectData as ProjectData } from "../models/Project";
 
