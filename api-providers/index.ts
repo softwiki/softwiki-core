@@ -1,4 +1,4 @@
 import Api from "./Api";
-import PlainMarkdownProvider from "./PlainMarkdownProvider";
+import FileSystemApiProvider from "./FileSystemApiProvider";
 
-export { Api, PlainMarkdownProvider };
+export { Api, FileSystemApiProvider };

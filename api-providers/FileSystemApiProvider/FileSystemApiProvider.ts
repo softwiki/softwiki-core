@@ -1,7 +1,7 @@
-import { generateMarkdownWithMetadata, parseMarkdownMetadata } from "../utils/markdown";
-import { SoftWikiError } from "../errors";
-import { NoteData, TagData, ProjectData, Tag } from "../models";
-import Api, {ApiNote, ApiProject, ApiTag} from "./Api";
+import { generateMarkdownWithMetadata, parseMarkdownMetadata } from "../../utils/markdown";
+import { SoftWikiError } from "../../errors";
+import { NoteData, TagData, ProjectData, Tag } from "../../models";
+import Api, {NoteApiData, ProjectApiData, TagApiData} from "../Api";
 import VirtualFileSystem from "./VirtualFileSystem";
 
 interface FileSystemApiCache
@@ -9,24 +9,21 @@ interface FileSystemApiCache
 	notes: {[index: string]: {
 		meta: any
 	}}
-	tagsByName: {[name: string]: ApiTag}
+	tagsByName: {[name: string]: TagApiData}
 
 	fsdiscovery: boolean
 }
 
-export default class FileSystemApi extends Api
+export default class FileSystemApiProvider extends Api
 {
 	private _basePath: string
-	private _fs: any
-	
+	private _fs: any	
 	private _cache: FileSystemApiCache
-	
 	private _virtualFileSystem: VirtualFileSystem
 
 	constructor(basePath: string, fs: unknown)
 	{
 		super();
-
 		this._basePath = basePath;
 		this._fs = fs;
 		this._cache = {notes: {}, fsdiscovery: false, tagsByName: {}};
@@ -42,7 +39,7 @@ export default class FileSystemApi extends Api
 		this._vfsInit = true;
 	}
 
-	public async createNote(data: NoteData): Promise<ApiNote>
+	public async createNote(data: NoteData): Promise<NoteApiData>
 	{
 		const file = this._virtualFileSystem.addFile(data.title);
 		await file.write(data.content);
@@ -51,7 +48,7 @@ export default class FileSystemApi extends Api
 		return {...data, id: file.id};
 	}
 	
-	public async getNotes(): Promise<ApiNote[]>
+	public async getNotes(): Promise<NoteApiData[]>
 	{
 		await this.getTags();
 		await this._initVirtualFileSystem();
@@ -155,7 +152,7 @@ export default class FileSystemApi extends Api
 		}));
 	}
 
-	public async createTag(data: TagData): Promise<ApiTag>
+	public async createTag(data: TagData): Promise<TagApiData>
 	{
 		const tags = Object.values(this.client.cache.tags).map((tag: Tag) =>
 		{
@@ -168,7 +165,7 @@ export default class FileSystemApi extends Api
 		return newTag;
 	}
 
-	public async getTags(): Promise<ApiTag[]>
+	public async getTags(): Promise<TagApiData[]>
 	{
 		const tagsData = JSON.parse(await this._fs.readFile(this._basePath + "/tags.json"));
 		this._cacheTags(tagsData);
@@ -181,18 +178,18 @@ export default class FileSystemApi extends Api
 		{
 			return {name: tag.getName(), color: tag.getColor(), id: tag.getId()};
 		});
-		const index = tags.findIndex((tag: ApiTag) => tag.id === id);
+		const index = tags.findIndex((tag: TagApiData) => tag.id === id);
 		if (index)
 			tags.splice(index, 1);
 		await this._fs.writeFile(this._basePath + "/tags.json", JSON.stringify(tags, null, 4));
 	}
 
-	private _cacheTags(tags: ApiTag[]): void
+	private _cacheTags(tags: TagApiData[]): void
 	{
-		tags.forEach((tag: ApiTag) => this._cacheTag(tag));
+		tags.forEach((tag: TagApiData) => this._cacheTag(tag));
 	}
 
-	private _cacheTag(tag: ApiTag): void
+	private _cacheTag(tag: TagApiData): void
 	{
 		this._cache.tagsByName[tag.name] = tag;
 	}
@@ -209,13 +206,13 @@ export default class FileSystemApi extends Api
 		await this._fs.writeFile(this._basePath + "/tags.json", JSON.stringify(tags, null, 4));
 	}
 
-	public async createProject(data: ProjectData): Promise<ApiProject>
+	public async createProject(data: ProjectData): Promise<ProjectApiData>
 	{
 		const directory = await this._virtualFileSystem.createDirectory(data.name);
 		return {...data, id: directory.id};
 	}
 
-	public async getProjects(): Promise<ApiProject[]>
+	public async getProjects(): Promise<ProjectApiData[]>
 	{
 		const projects = [];
 

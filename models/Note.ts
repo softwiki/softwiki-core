@@ -1,7 +1,7 @@
 import { Tag } from "./Tag";
 import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
 import { Project } from "./Project";
-import { ApiNote } from "../api-providers/Api";
+import { NoteApiData } from "../api-providers/Api";
 import { Base } from "./Base";
 
 export interface NoteData
@@ -16,7 +16,7 @@ export class Note extends Base
 {
 	private _data: NoteData
 
-	constructor(data: ApiNote, client: SoftWikiClient)
+	constructor(data: NoteApiData, client: SoftWikiClient)
 	{
 		super(data.id, client);
 		this._data = {title: data.title, content: data.content, tags: [...data.tags], project: data.project};

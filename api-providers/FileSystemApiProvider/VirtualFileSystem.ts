@@ -1,4 +1,4 @@
-import { SoftWikiError } from "../errors";
+import { SoftWikiError } from "../../errors";
 
 let nextId = 0;
 function generateId(): string

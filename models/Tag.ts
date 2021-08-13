@@ -1,4 +1,4 @@
-import { ApiTag } from "../api-providers/Api";
+import { TagApiData } from "../api-providers/Api";
 import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
 import { Base } from "./Base";
 
@@ -20,7 +20,7 @@ export class Tag extends Base
 {
 	private _data: TagData
 
-	constructor(data: ApiTag, client: SoftWikiClient)
+	constructor(data: TagApiData, client: SoftWikiClient)
 	{
 		super(data.id, client);
 		this._data = data;

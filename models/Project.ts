@@ -1,5 +1,5 @@
 import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
-import { ApiProject } from "../api-providers/Api";
+import { ProjectApiData } from "../api-providers/Api";
 import { Note } from "./Note";
 import { Base } from "./Base";
 
@@ -12,7 +12,7 @@ export class Project extends Base
 {
 	private _data: ProjectData
 
-	constructor(data: ApiProject, client: SoftWikiClient)
+	constructor(data: ProjectApiData, client: SoftWikiClient)
 	{
 		super(data.id, client);
 		this._data = data;

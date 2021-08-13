@@ -2,7 +2,7 @@ import { Note, NoteData } from "./models";
 import { Tag, TagData } from "./models";
 import { Project, ProjectData } from "./models";
 
-import Api, { ApiNote, ApiProject, ApiTag } from "./api-providers/Api";
+import Api, { NoteApiData, ProjectApiData, TagApiData } from "./api-providers/Api";
 import { EventService } from "./services";
 
 export enum DataEvent
@@ -60,7 +60,7 @@ export class SoftWikiClient
 	{
 		this.cache.notes = {};
 		const notesData = await this._apiProvider.getNotes();
-		const notes = notesData.map((note: ApiNote) =>
+		const notes = notesData.map((note: NoteApiData) =>
 		{
 			return this._apiResponseToNote(note);
 		});
@@ -79,7 +79,7 @@ export class SoftWikiClient
 	{
 		this.cache.tags = {};
 		const tagsData = await this._apiProvider.getTags();
-		const tags = tagsData.map((tag: ApiTag) =>
+		const tags = tagsData.map((tag: TagApiData) =>
 		{
 			return this._apiResponseToTag(tag);
 		});
@@ -97,7 +97,7 @@ export class SoftWikiClient
 	public async fetchProjects(): Promise<Project[]>
 	{
 		const projectsData = await this._apiProvider.getProjects();
-		const projects = projectsData.map((projec: ApiProject) =>
+		const projects = projectsData.map((projec: ProjectApiData) =>
 		{
 			return this._apiResponseToProject(projec);
 		});
@@ -134,19 +134,19 @@ export class SoftWikiClient
 		return Object.values(this.cache.projects);
 	}
 	
-	private _apiResponseToNote(data: ApiNote): Note
+	private _apiResponseToNote(data: NoteApiData): Note
 	{
 		this.cache.notes[data.id] = new Note(data, this);
 		return new Note(data, this);
 	}
 
-	private _apiResponseToTag(data: ApiTag): Tag
+	private _apiResponseToTag(data: TagApiData): Tag
 	{
 		this.cache.tags[data.id] = new Tag(data, this);
 		return new Tag(data, this);
 	}
 
-	private _apiResponseToProject(data: ApiProject): Project
+	private _apiResponseToProject(data: ProjectApiData): Project
 	{
 		this.cache.projects[data.id] = new Project(data, this);
 		return new Project(data, this);
