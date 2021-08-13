@@ -18,7 +18,7 @@ interface SoftWikiApiParameters
 	provider: Api
 }
 
-export interface ApiCache
+export interface ClientCache
 {
 	notes: {[index: string]: Note}
 	tags: {[index: string]: Tag}
@@ -30,7 +30,7 @@ export class SoftWikiClient
 	private _events: EventService
 	private _apiProvider: Api
 	
-	public cache: ApiCache = {notes: {}, tags: {}, projects: {}}
+	public cache: ClientCache = {notes: {}, tags: {}, projects: {}}
 
 	constructor(args: SoftWikiApiParameters)
 	{

@@ -1,17 +1,17 @@
-import { generateMarkdownWithMetadata, parseMarkdownMetadata } from "../../utils/markdown";
-import { SoftWikiError } from "../../errors";
-import { NoteData, TagData, ProjectData, Tag } from "../../models";
+import { NoteData, TagData, ProjectData } from "../../models";
 import Api, {NoteApiData, ProjectApiData, TagApiData} from "../Api";
 import VirtualFileSystem from "./VirtualFileSystem";
+import ProjectsApiHandler from "./ProjectsApiHandler";
+import NotesApiHandler from "./NotesApiHandler";
+import TagsApiHandler from "./TagsApiHandler";
 
-interface FileSystemApiCache
+export interface FileSystemApiCache
 {
 	notes: {[index: string]: {
 		meta: any
 	}}
-	tagsByName: {[name: string]: TagApiData}
-
-	fsdiscovery: boolean
+	tagsDataByName: {[name: string]: TagApiData}
+	notesIdByTagId: {[tagId: string]: string[]}
 }
 
 export default class FileSystemApiProvider extends Api
@@ -20,14 +20,22 @@ export default class FileSystemApiProvider extends Api
 	private _fs: any	
 	private _cache: FileSystemApiCache
 	private _virtualFileSystem: VirtualFileSystem
+	
+	private _notesApiHandler: NotesApiHandler
+	private _tagsApiHandler: TagsApiHandler
+	private _projectsApiHandler: ProjectsApiHandler
 
 	constructor(basePath: string, fs: unknown)
 	{
 		super();
 		this._basePath = basePath;
 		this._fs = fs;
-		this._cache = {notes: {}, fsdiscovery: false, tagsByName: {}};
+		this._cache = {notes: {}, tagsDataByName: {}, notesIdByTagId: {}};
 		this._virtualFileSystem = new VirtualFileSystem(this._basePath, this._fs);
+
+		this._notesApiHandler = new NotesApiHandler(this._virtualFileSystem, this._cache, this);
+		this._tagsApiHandler = new TagsApiHandler(this._virtualFileSystem, this._cache, this);
+		this._projectsApiHandler = new ProjectsApiHandler(this._virtualFileSystem, this._cache, this);
 	}
 
 	private _vfsInit = false;
@@ -38,235 +46,76 @@ export default class FileSystemApiProvider extends Api
 		await this._virtualFileSystem.init();
 		this._vfsInit = true;
 	}
-
+	
 	public async createNote(data: NoteData): Promise<NoteApiData>
 	{
-		const file = this._virtualFileSystem.addFile(data.title);
-		await file.write(data.content);
-		this._cache.notes[file.id] = {meta: {}};
-
-		return {...data, id: file.id};
+		return this._notesApiHandler.createNote(data);
 	}
 	
 	public async getNotes(): Promise<NoteApiData[]>
 	{
-		await this.getTags();
 		await this._initVirtualFileSystem();
-		const notes = [];
-
-		for (const [, directory] of Object.entries(this._virtualFileSystem.directories))
-		{
-			for (const [fileId, file] of Object.entries(directory.files))
-			{
-				const source = await this._fs.readFile(file.path, "utf8");
-				const md = parseMarkdownMetadata(source);
-				const tags = await this._parseTagsMeta(md.meta["tags"]);
-
-				this._cache.notes[fileId] = {meta: md.meta};
-
-				notes.push({
-					id: fileId,
-					title: file.name,
-					content: md.content,
-					tags: tags,
-					project: directory.id
-				});
-			}
-		}
-		return notes;
+		await this.getTags();
+		return this._notesApiHandler.getNotes();
 	}
 
 	public async deleteNote(id: string): Promise<void>
 	{
-		const file = this._virtualFileSystem.getFileById(id);
-		if (!file)
-			throw new SoftWikiError("File with id " + id + " doesn't exist");
-		await file.delete();
+		await this._notesApiHandler.deleteNote(id);
 	}
 	
 	public async updateNote(id: string, data: NoteData): Promise<void>
 	{
-		const oldNote = this.client.cache.notes[id];
-		if (oldNote === undefined)
-			throw new SoftWikiError("Cannot find old note in cache when trying to update");
-
-		const oldData = oldNote.getDataCopy();
-
-		let file = this._virtualFileSystem.getFileById(id);
-		if (!file)
-			throw new SoftWikiError("File with id " + id + " doesn't exist");
-
-		if (oldData.title !== data.title)
-		{
-			file = await file.rename(data.title);
-		}
-
-		if (oldData.project !== data.project)
-		{
-			const directoryId = data.project ?? this._virtualFileSystem.id;
-			const directory = this._virtualFileSystem.getDirectoryById(directoryId);
-			if (!directory)
-				throw new SoftWikiError("Directory with id " + directoryId + " doesn't exist");
-			file = await file.moveTo(directory.id);
-		}
-		
-		const content = generateMarkdownWithMetadata(data.content, {
-			...this._cache.notes[id].meta,
-			tags: this._tagDataToString(data.tags)
-		});
-
-		await file.write(content);
+		await this._notesApiHandler.updateNote(id, data);
 	}
 
 	public async removeTagFromNote(noteId: string, tagId: string): Promise<void>
 	{
-		const note = this.client.cache.notes[noteId];
-		const data = note.getDataCopy();
-		const index = data.tags.indexOf(tagId);
-		if (index !== -1)
-		{
-			data.tags.splice(index, 1);
-		}
-		const file = this._virtualFileSystem.getFileById(noteId);
-		await file?.write(generateMarkdownWithMetadata(data.content, {
-			tags: this._tagDataToString(data.tags)
-		}));
-	}
-
-	private _tagDataToString(tags: string[]): string
-	{
-		return tags.map((tagId: string) =>
-		{
-			return this.client.cache.tags[tagId].getName();
-		}).join(", ");
+		await this._notesApiHandler.removeTagFromNote(noteId, tagId);
 	}
 
 	public async addTagToNote(noteId: string, tagId: string): Promise<void>
 	{
-		const note = this.client.cache.notes[noteId];
-		const data = note.getDataCopy();
-		data.tags.push(tagId);
-		const file = this._virtualFileSystem.getFileById(noteId);
-		await file?.write(generateMarkdownWithMetadata(data.content, {
-			tags: this._tagDataToString(data.tags)
-		}));
+		await this._notesApiHandler.addTagToNote(noteId, tagId);
 	}
-
+	
 	public async createTag(data: TagData): Promise<TagApiData>
 	{
-		const tags = Object.values(this.client.cache.tags).map((tag: Tag) =>
-		{
-			return {name: tag.getName(), color: tag.getColor(), id: tag.getId()};
-		});
-		const newTag = {...data, id: Date.now().toString()};
-		tags.push(newTag);
-		this._cacheTag(newTag);
-		await this._fs.writeFile(this._basePath + "/tags.json", JSON.stringify(tags, null, 4));
-		return newTag;
+		return this._tagsApiHandler.createTag(data);
 	}
 
 	public async getTags(): Promise<TagApiData[]>
 	{
-		const tagsData = JSON.parse(await this._fs.readFile(this._basePath + "/tags.json"));
-		this._cacheTags(tagsData);
-		return tagsData;
+		return this._tagsApiHandler.getTags();
 	}
 
 	public async deleteTag(id: string): Promise<void>
 	{
-		const tags = Object.values(this.client.cache.tags).map((tag: Tag) =>
-		{
-			return {name: tag.getName(), color: tag.getColor(), id: tag.getId()};
-		});
-		const index = tags.findIndex((tag: TagApiData) => tag.id === id);
-		if (index)
-			tags.splice(index, 1);
-		await this._fs.writeFile(this._basePath + "/tags.json", JSON.stringify(tags, null, 4));
-	}
-
-	private _cacheTags(tags: TagApiData[]): void
-	{
-		tags.forEach((tag: TagApiData) => this._cacheTag(tag));
-	}
-
-	private _cacheTag(tag: TagApiData): void
-	{
-		this._cache.tagsByName[tag.name] = tag;
+		await this._tagsApiHandler.deleteTag(id);
 	}
 
 	public async updateTag(id: string, data: TagData): Promise<void>
 	{
-		const tags = Object.values(this.client.cache.tags).map((tag: Tag) =>
-		{
-			if (tag.getId() === id)
-				return {...data, id};
-			return {name: tag.getName(), color: tag.getColor(), id: tag.getId()};
-		});
-		this._cacheTag({...data, id});
-		await this._fs.writeFile(this._basePath + "/tags.json", JSON.stringify(tags, null, 4));
+		await this._tagsApiHandler.updateTag(id, data);
 	}
 
 	public async createProject(data: ProjectData): Promise<ProjectApiData>
 	{
-		const directory = await this._virtualFileSystem.createDirectory(data.name);
-		return {...data, id: directory.id};
+		return this._projectsApiHandler.createProject(data);
 	}
 
 	public async getProjects(): Promise<ProjectApiData[]>
 	{
-		const projects = [];
-
-		for (const [directoryId, directory] of Object.entries(this._virtualFileSystem.directories))
-		{
-			if (directory.name === ".")
-				continue ;
-
-			projects.push({
-				id: directoryId,
-				name: directory.name,
-				notes: Object.keys(directory.files)
-			});
-		}
-		return projects;
+		return this._projectsApiHandler.getProjects();
 	}
 
 	public async deleteProject(id: string): Promise<void>
 	{
-		const directory = this._virtualFileSystem.getDirectoryById(id);
-		if (!directory)
-			throw new SoftWikiError("Directory with id " + id + " doesn't exist");
-		await directory.delete();
+		await this._projectsApiHandler.deleteProject(id);
 	}
 
 	public async updateProject(id: string, data: ProjectData): Promise<void>
 	{
-		const directory = this._virtualFileSystem.getDirectoryById(id);
-		if (!directory)
-			throw new Error("Directory with id " + id + " doesn't exist");
-
-		const project = this.client.cache.projects[id];
-		if (!project)
-		{
-			throw new Error("Project with id " + id + " doesn't exist in cache");
-		}
-
-		const oldData = project.getDataCopy();
-		if (oldData.name !== data.name)
-		{
-			await directory.rename(data.name);
-		}
-	}
-
-	private async _parseTagsMeta(tagsStr: string): Promise<string[]>
-	{
-		if (tagsStr === undefined || tagsStr.trim().length === 0)
-			return [];
-		const validTags: string[] = [];
-		tagsStr.split(",").forEach((tagStr: string) =>
-		{
-			if (this._cache.tagsByName[tagStr])
-				validTags.push(this._cache.tagsByName[tagStr].id);
-		});
-		return validTags;
+		await this._projectsApiHandler.updateProject(id, data);
 	}
 }

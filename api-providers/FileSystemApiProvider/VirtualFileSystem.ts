@@ -172,6 +172,11 @@ export class FileSystemFile extends FileSystemNode<FileSystemFile>
 	{
 		await this.root.fs.writeFile(this.path, content);
 	}
+	
+	async read(): Promise<string>
+	{
+		return await this.root.fs.readFile(this.path, "utf8");
+	}
 
 	async delete(): Promise<void>
 	{
@@ -188,6 +193,9 @@ export class FileSystemFile extends FileSystemNode<FileSystemFile>
 export default class VirtualFileSystem extends FileSystemDirectory
 {
 	public fs: any
+	private _notesDirectory: FileSystemDirectory = {} as FileSystemDirectory
+	private _configDirectory: FileSystemDirectory = {} as FileSystemDirectory
+	private _tagsFile: FileSystemFile = {} as FileSystemFile
 
 	constructor(basePath: string, fs: unknown)
 	{
@@ -195,14 +203,19 @@ export default class VirtualFileSystem extends FileSystemDirectory
 		this.fs = fs;
 	}
 
+	public get notes(): FileSystemDirectory { return this._notesDirectory; }
+	public get tags(): FileSystemFile { return this._tagsFile; }
+
 	async init(): Promise<void>
 	{
-		const directoriesName = await this._getDirectories(this.basePath);
+		this._notesDirectory = this.addDirectory("notes");
+
+		const directoriesName = await this._getDirectories(this._notesDirectory.path);
 		directoriesName.push(".");
 
 		for (const directoryName of directoriesName)
 		{
-			const directory = this.addDirectory(directoryName);
+			const directory = this._notesDirectory.addDirectory(directoryName);
 			const filesNames = await this._getFiles(directory.path);
 
 			for (const fileName of filesNames)
@@ -210,6 +223,9 @@ export default class VirtualFileSystem extends FileSystemDirectory
 				directory.addFile(fileName);
 			}
 		}
+
+		this._configDirectory = this.addDirectory("config");
+		this._tagsFile = this._configDirectory.addFile("tags.json");
 	}
 
 	private async _getDirectories(path: string): Promise<string[]>
