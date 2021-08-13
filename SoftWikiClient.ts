@@ -137,19 +137,19 @@ export class SoftWikiClient
 	private _apiResponseToNote(data: NoteApiData): Note
 	{
 		this.cache.notes[data.id] = new Note(data, this);
-		return new Note(data, this);
+		return this.cache.notes[data.id];
 	}
 
 	private _apiResponseToTag(data: TagApiData): Tag
 	{
 		this.cache.tags[data.id] = new Tag(data, this);
-		return new Tag(data, this);
+		return this.cache.tags[data.id];
 	}
 
 	private _apiResponseToProject(data: ProjectApiData): Project
 	{
 		this.cache.projects[data.id] = new Project(data, this);
-		return new Project(data, this);
+		return this.cache.projects[data.id];
 	}
 }
 

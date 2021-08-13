@@ -14,7 +14,7 @@ export default class ProjectsApiHandler extends ApiHandlerBase
 	
 	public async createProject(data: ProjectData): Promise<ProjectApiData>
 	{
-		const directory = await this._virtualFileSystem.createDirectory(data.name);
+		const directory = await this._virtualFileSystem.notes.createDirectory(data.name);
 		return {...data, id: directory.id};
 	}
 
@@ -38,7 +38,7 @@ export default class ProjectsApiHandler extends ApiHandlerBase
 
 	public async deleteProject(id: string): Promise<void>
 	{
-		const directory = this._virtualFileSystem.getDirectoryById(id);
+		const directory = this._virtualFileSystem.notes.getDirectoryById(id);
 		if (!directory)
 			throw new SoftWikiError("Directory with id " + id + " doesn't exist");
 		await directory.delete();
@@ -46,7 +46,7 @@ export default class ProjectsApiHandler extends ApiHandlerBase
 
 	public async updateProject(id: string, data: ProjectData): Promise<void>
 	{
-		const directory = this._virtualFileSystem.getDirectoryById(id);
+		const directory = this._virtualFileSystem.notes.getDirectoryById(id);
 		if (!directory)
 			throw new Error("Directory with id " + id + " doesn't exist");
 

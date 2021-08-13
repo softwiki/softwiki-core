@@ -15,7 +15,7 @@ export default class NotesApiHandler extends ApiHandlerBase
 	
 	public async createNote(data: NoteData): Promise<NoteApiData>
 	{
-		const file = this._virtualFileSystem.addFile(data.title);
+		const file = this._virtualFileSystem.notes.addFile(data.title);
 		await file.write(data.content);
 		this._cache.notes[file.id] = {meta: {}};
 
@@ -50,7 +50,7 @@ export default class NotesApiHandler extends ApiHandlerBase
 
 	public async deleteNote(id: string): Promise<void>
 	{
-		const file = this._virtualFileSystem.getFileById(id);
+		const file = this._virtualFileSystem.notes.getFileById(id);
 		if (!file)
 			throw new SoftWikiError("File with id " + id + " doesn't exist");
 		await file.delete();
@@ -64,7 +64,7 @@ export default class NotesApiHandler extends ApiHandlerBase
 
 		const oldData = oldNote.getDataCopy();
 
-		let file = this._virtualFileSystem.getFileById(id);
+		let file = this._virtualFileSystem.notes.getFileById(id);
 		if (!file)
 			throw new SoftWikiError("File with id " + id + " doesn't exist");
 
@@ -75,8 +75,8 @@ export default class NotesApiHandler extends ApiHandlerBase
 
 		if (oldData.project !== data.project)
 		{
-			const directoryId = data.project ?? this._virtualFileSystem.id;
-			const directory = this._virtualFileSystem.getDirectoryById(directoryId);
+			const directoryId = data.project ?? this._virtualFileSystem.notes.id;
+			const directory = this._virtualFileSystem.notes.getDirectoryById(directoryId);
 			if (!directory)
 				throw new SoftWikiError("Directory with id " + directoryId + " doesn't exist");
 			file = await file.moveTo(directory.id);
@@ -99,7 +99,7 @@ export default class NotesApiHandler extends ApiHandlerBase
 		{
 			data.tags.splice(index, 1);
 		}
-		const file = this._virtualFileSystem.getFileById(noteId);
+		const file = this._virtualFileSystem.notes.getFileById(noteId);
 		await file?.write(generateMarkdownWithMetadata(data.content, {
 			tags: this._tagDataToString(data.tags)
 		}));
@@ -110,7 +110,7 @@ export default class NotesApiHandler extends ApiHandlerBase
 		const note = this._clientCache.notes[noteId];
 		const data = note.getDataCopy();
 		data.tags.push(tagId);
-		const file = this._virtualFileSystem.getFileById(noteId);
+		const file = this._virtualFileSystem.notes.getFileById(noteId);
 		await file?.write(generateMarkdownWithMetadata(data.content, {
 			tags: this._tagDataToString(data.tags)
 		}));
