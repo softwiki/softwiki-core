@@ -14,6 +14,11 @@ const COLLECTION_NOTES = "notes";
 const COLLECTION_TAGS = "tags";
 const COLLECTION_PROJECTS = "categories";
 
+function clone(x: any): any
+{
+	return JSON.parse(JSON.stringify(x));
+}
+
 export default class JsonApiProvider extends Api
 {
 	private _collections: ICollections
@@ -54,7 +59,7 @@ export default class JsonApiProvider extends Api
 
 		collection.push(documentDB);
 		await this._saveDatabase();
-		return documentDB as NoteApiData;
+		return clone(documentDB) as NoteApiData;
 	}
 	
 	private _didSetup = false;
@@ -65,7 +70,7 @@ export default class JsonApiProvider extends Api
 			await this.setup();
 			this._didSetup = true;
 		}
-		return JSON.parse(JSON.stringify(this._getCollection(COLLECTION_NOTES))); // Another way of cloning ?
+		return clone(this._getCollection(COLLECTION_NOTES));
 	}
 
 	public async deleteNote(id: string): Promise<void>
@@ -88,7 +93,7 @@ export default class JsonApiProvider extends Api
 		
 		if (index !== -1)
 		{
-			collection[index] = {...data, id};
+			collection[index] = {...clone(data), id};
 			await this._saveDatabase();
 		}
 	}
@@ -119,12 +124,12 @@ export default class JsonApiProvider extends Api
 
 		collection.push(documentDB);
 		await this._saveDatabase();
-		return documentDB as TagApiData;
+		return clone(documentDB) as TagApiData;
 	}
 
 	public async getTags(): Promise<TagApiData[]>
 	{
-		return JSON.parse(JSON.stringify(this._getCollection(COLLECTION_TAGS)));
+		return clone(this._getCollection(COLLECTION_TAGS));
 	}
 
 	public async deleteTag(id: string): Promise<void>
@@ -147,7 +152,7 @@ export default class JsonApiProvider extends Api
 		
 		if (index !== -1)
 		{
-			collection[index] = {...data, id};
+			collection[index] = {...clone(data), id};
 			await this._saveDatabase();
 			return ;
 		}
@@ -162,12 +167,12 @@ export default class JsonApiProvider extends Api
 
 		collection.push(documentDB);
 		await this._saveDatabase();
-		return documentDB as CategoryApiData;
+		return clone(documentDB) as CategoryApiData;
 	}
 
 	public async getCategories(): Promise<CategoryApiData[]>
 	{
-		return JSON.parse(JSON.stringify(this._getCollection(COLLECTION_PROJECTS)));
+		return clone(this._getCollection(COLLECTION_PROJECTS));
 	}
 
 	public async deleteCategory(id: string): Promise<void>
@@ -190,7 +195,7 @@ export default class JsonApiProvider extends Api
 		
 		if (index !== -1)
 		{
-			collection[index] = {...data, id};
+			collection[index] = {...clone(data), id};
 			await this._saveDatabase();
 			return ;
 		}
@@ -198,7 +203,7 @@ export default class JsonApiProvider extends Api
 
 	private _createDocument(originalDocument: any): any
 	{
-		return {...originalDocument, id: Date.now()};
+		return {...clone(originalDocument), id: Date.now()};
 	}
 
 	private _getCollection<T>(collectionName: string): T[]
