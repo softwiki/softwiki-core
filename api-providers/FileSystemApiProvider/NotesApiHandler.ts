@@ -41,7 +41,7 @@ export default class NotesApiHandler extends ApiHandlerBase
 					title: file.name,
 					content: md.content,
 					tags: tagsId,
-					project: directory.id
+					category: directory.id
 				});
 			}
 		}
@@ -73,9 +73,9 @@ export default class NotesApiHandler extends ApiHandlerBase
 			file = await file.rename(data.title);
 		}
 
-		if (oldData.project !== data.project)
+		if (oldData.category !== data.category)
 		{
-			const directoryId = data.project ?? this._virtualFileSystem.notes.id;
+			const directoryId = data.category ?? this._virtualFileSystem.notes.id;
 			const directory = this._virtualFileSystem.notes.getDirectoryById(directoryId);
 			if (!directory)
 				throw new SoftWikiError("Directory with id " + directoryId + " doesn't exist");

@@ -1,7 +1,7 @@
-import { NoteData, TagData, ProjectData } from "../../models";
-import Api, {NoteApiData, ProjectApiData, TagApiData} from "../Api";
+import { NoteData, TagData, CategoryData } from "../../models";
+import Api, {NoteApiData, CategoryApiData, TagApiData} from "../Api";
 import VirtualFileSystem from "./VirtualFileSystem";
-import ProjectsApiHandler from "./ProjectsApiHandler";
+import CategoriesApiHandler from "./CategoriesApiHandler";
 import NotesApiHandler from "./NotesApiHandler";
 import TagsApiHandler from "./TagsApiHandler";
 
@@ -23,7 +23,7 @@ export default class FileSystemApiProvider extends Api
 	
 	private _notesApiHandler: NotesApiHandler
 	private _tagsApiHandler: TagsApiHandler
-	private _projectsApiHandler: ProjectsApiHandler
+	private _categoriesApiHandler: CategoriesApiHandler
 
 	constructor(basePath: string, fs: unknown)
 	{
@@ -35,7 +35,7 @@ export default class FileSystemApiProvider extends Api
 
 		this._notesApiHandler = new NotesApiHandler(this._virtualFileSystem, this._cache, this);
 		this._tagsApiHandler = new TagsApiHandler(this._virtualFileSystem, this._cache, this);
-		this._projectsApiHandler = new ProjectsApiHandler(this._virtualFileSystem, this._cache, this);
+		this._categoriesApiHandler = new CategoriesApiHandler(this._virtualFileSystem, this._cache, this);
 	}
 
 	private _vfsInit = false;
@@ -99,23 +99,23 @@ export default class FileSystemApiProvider extends Api
 		await this._tagsApiHandler.updateTag(id, data);
 	}
 
-	public async createProject(data: ProjectData): Promise<ProjectApiData>
+	public async createCategory(data: CategoryData): Promise<CategoryApiData>
 	{
-		return this._projectsApiHandler.createProject(data);
+		return this._categoriesApiHandler.createCategory(data);
 	}
 
-	public async getProjects(): Promise<ProjectApiData[]>
+	public async getCategories(): Promise<CategoryApiData[]>
 	{
-		return this._projectsApiHandler.getProjects();
+		return this._categoriesApiHandler.getCategories();
 	}
 
-	public async deleteProject(id: string): Promise<void>
+	public async deleteCategory(id: string): Promise<void>
 	{
-		await this._projectsApiHandler.deleteProject(id);
+		await this._categoriesApiHandler.deleteCategory(id);
 	}
 
-	public async updateProject(id: string, data: ProjectData): Promise<void>
+	public async updateCategory(id: string, data: CategoryData): Promise<void>
 	{
-		await this._projectsApiHandler.updateProject(id, data);
+		await this._categoriesApiHandler.updateCategory(id, data);
 	}
 }

@@ -1,6 +1,6 @@
 import { Tag } from "./Tag";
 import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
-import { Project } from "./Project";
+import { Category } from "./Category";
 import { NoteApiData } from "../api-providers/Api";
 import { Base } from "./Base";
 
@@ -9,7 +9,7 @@ export interface NoteData
 	title: string
 	content: string
 	tags: string[]
-	project: string | undefined
+	category: string | undefined
 }
 
 export class Note extends Base
@@ -19,7 +19,7 @@ export class Note extends Base
 	constructor(data: NoteApiData, client: SoftWikiClient)
 	{
 		super(data.id, client);
-		this._data = {title: data.title, content: data.content, tags: [...data.tags], project: data.project};
+		this._data = {title: data.title, content: data.content, tags: [...data.tags], category: data.category};
 	}
 
 	public async setTitle(title: string): Promise<void>
@@ -36,10 +36,10 @@ export class Note extends Base
 		this._client.run(DataEvent.NotesUpdated, {note: this});
 	}
 	
-	public async setProject(project: Project | null): Promise<void>
+	public async setCategory(category: Category | null): Promise<void>
 	{
-		await this._api.updateNote(this._id, {...this._data, project: project ? project.getId() : undefined});
-		this._data.project = project !== null ? project.getId() : undefined;
+		await this._api.updateNote(this._id, {...this._data, category: category ? category.getId() : undefined});
+		this._data.category = category !== null ? category.getId() : undefined;
 		this._client.run(DataEvent.NotesUpdated, {note: this});
 	}
 
@@ -77,15 +77,15 @@ export class Note extends Base
 		return this._data.tags.map((tagId: string) => this._client.cache.tags[tagId]).filter((tag: Tag) => tag !== undefined);
 	}
 
-	public belongToProject(project: Project): boolean
+	public belongToCategory(category: Category): boolean
 	{
-		return project.getId() == this._data.project;
+		return category.getId() == this._data.category;
 	}
 
-	public getProject(): Project | undefined
+	public getCategory(): Category | undefined
 	{
-		if (this._data.project)
-			return this._client.cache.projects[this._data.project];
+		if (this._data.category)
+			return this._client.cache.categories[this._data.category];
 	}
 
 	public hasTag(tag: Tag): boolean

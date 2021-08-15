@@ -1,18 +1,18 @@
-import { NoteData, ProjectData, TagData } from "softwiki-core/models";
+import { NoteData, CategoryData, TagData } from "softwiki-core/models";
 import { Api } from ".";
-import { NoteApiData, ProjectApiData, TagApiData } from "./Api";
+import { NoteApiData, CategoryApiData, TagApiData } from "./Api";
 
 interface ICollections
 {
-	[index: string]: NoteApiData[] | TagApiData[] | ProjectApiData[]
+	[index: string]: NoteApiData[] | TagApiData[] | CategoryApiData[]
 	notes: NoteApiData[]
 	tags: TagApiData[]
-	projects: ProjectApiData[]
+	categories: CategoryApiData[]
 }
 
 const COLLECTION_NOTES = "notes";
 const COLLECTION_TAGS = "tags";
-const COLLECTION_PROJECTS = "projects";
+const COLLECTION_PROJECTS = "categories";
 
 export default class JsonApiProvider extends Api
 {
@@ -27,7 +27,7 @@ export default class JsonApiProvider extends Api
 		this._collections = {
 			notes: [],
 			tags: [],
-			projects: []
+			categories: []
 		};
 
 		this._writeDatabase = writeDatabase;
@@ -155,24 +155,24 @@ export default class JsonApiProvider extends Api
 
 	// ---
 
-	public async createProject(document: ProjectData): Promise<ProjectApiData>
+	public async createCategory(document: CategoryData): Promise<CategoryApiData>
 	{
 		const documentDB = this._createDocument(document);
 		const collection = this._getCollection(COLLECTION_PROJECTS);
 
 		collection.push(documentDB);
 		await this._saveDatabase();
-		return documentDB as ProjectApiData;
+		return documentDB as CategoryApiData;
 	}
 
-	public async getProjects(): Promise<ProjectApiData[]>
+	public async getCategories(): Promise<CategoryApiData[]>
 	{
 		return JSON.parse(JSON.stringify(this._getCollection(COLLECTION_PROJECTS)));
 	}
 
-	public async deleteProject(id: string): Promise<void>
+	public async deleteCategory(id: string): Promise<void>
 	{
-		const collection = this._getCollection<ProjectApiData>(COLLECTION_PROJECTS);
+		const collection = this._getCollection<CategoryApiData>(COLLECTION_PROJECTS);
 		const index = this._getIndexInCollectionByID(COLLECTION_PROJECTS, id);
 
 		if (index !== -1)
@@ -183,9 +183,9 @@ export default class JsonApiProvider extends Api
 		}
 	}
 
-	public async updateProject(id: string, data: ProjectData): Promise<void>
+	public async updateCategory(id: string, data: CategoryData): Promise<void>
 	{
-		const collection = this._getCollection<ProjectApiData>(COLLECTION_PROJECTS);
+		const collection = this._getCollection<CategoryApiData>(COLLECTION_PROJECTS);
 		const index = this._getIndexInCollectionByID(COLLECTION_PROJECTS, id);
 		
 		if (index !== -1)

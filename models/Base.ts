@@ -1,7 +1,7 @@
-import Api, { NoteApiData, ProjectApiData, TagApiData } from "../api-providers/Api";
+import Api, { NoteApiData, CategoryApiData, TagApiData } from "../api-providers/Api";
 import { SoftWikiClient } from "..";
 import { Note } from "./Note";
-import { Project, Tag } from ".";
+import { Category, Tag } from ".";
 
 export class Base
 {
@@ -35,10 +35,10 @@ export class Base
 		return tag;
 	}
 
-	protected _cacheAndReturnProject(data: ProjectApiData): Project
+	protected _cacheAndReturnCategory(data: CategoryApiData): Category
 	{
-		const project = new Project(data, this._client);
-		this._client.cache.projects[project.getId()] = project;
-		return project;
+		const category = new Category(data, this._client);
+		this._client.cache.categories[category.getId()] = category;
+		return category;
 	}
 }

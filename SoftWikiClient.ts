@@ -1,8 +1,8 @@
 import { Note, NoteData } from "./models";
 import { Tag, TagData } from "./models";
-import { Project, ProjectData } from "./models";
+import { Category, CategoryData } from "./models";
 
-import Api, { NoteApiData, ProjectApiData, TagApiData } from "./api-providers/Api";
+import Api, { NoteApiData, CategoryApiData, TagApiData } from "./api-providers/Api";
 import { EventService } from "./services";
 
 export enum DataEvent
@@ -10,7 +10,7 @@ export enum DataEvent
 	NoteCreated = "Notes.Created",
 	NotesUpdated = "Notes.Updated",
 	TagsUpdated = "Tags.Updated",
-	ProjectsUpdated = "Projects.Updated"
+	CategoriesUpdated = "Categories.Updated"
 }
 
 interface SoftWikiApiParameters
@@ -22,7 +22,7 @@ export interface ClientCache
 {
 	notes: {[index: string]: Note}
 	tags: {[index: string]: Tag}
-	projects: {[index: string]: Project}
+	categories: {[index: string]: Category}
 }
 
 export class SoftWikiClient
@@ -30,7 +30,7 @@ export class SoftWikiClient
 	private _events: EventService
 	private _apiProvider: Api
 	
-	public cache: ClientCache = {notes: {}, tags: {}, projects: {}}
+	public cache: ClientCache = {notes: {}, tags: {}, categories: {}}
 
 	constructor(args: SoftWikiApiParameters)
 	{
@@ -44,7 +44,7 @@ export class SoftWikiClient
 	{
 		await this.fetchNotes();
 		await this.fetchTags();
-		await this.fetchProjects();
+		await this.fetchCategories();
 	}
 
 	public async createNote(properties: NoteData): Promise<Note>
@@ -86,22 +86,22 @@ export class SoftWikiClient
 		return tags;
 	}
 
-	public async createProject(properties: ProjectData): Promise<Project>
+	public async createCategory(properties: CategoryData): Promise<Category>
 	{
-		const data = await this._apiProvider.createProject(properties);
-		const project = this._apiResponseToProject(data);
-		this._events.run(DataEvent.ProjectsUpdated);
-		return project;
+		const data = await this._apiProvider.createCategory(properties);
+		const category = this._apiResponseToCategory(data);
+		this._events.run(DataEvent.CategoriesUpdated);
+		return category;
 	}
 
-	public async fetchProjects(): Promise<Project[]>
+	public async fetchCategories(): Promise<Category[]>
 	{
-		const projectsData = await this._apiProvider.getProjects();
-		const projects = projectsData.map((projec: ProjectApiData) =>
+		const categoriesData = await this._apiProvider.getCategories();
+		const categories = categoriesData.map((projec: CategoryApiData) =>
 		{
-			return this._apiResponseToProject(projec);
+			return this._apiResponseToCategory(projec);
 		});
-		return projects;
+		return categories;
 	}
 
 	public subscribe(name: string, id: string, handler: (args: unknown) => void): void
@@ -129,9 +129,9 @@ export class SoftWikiClient
 		return Object.values(this.cache.tags);
 	}
 
-	get projects(): Project[]
+	get categories(): Category[]
 	{
-		return Object.values(this.cache.projects);
+		return Object.values(this.cache.categories);
 	}
 	
 	private _apiResponseToNote(data: NoteApiData): Note
@@ -146,10 +146,10 @@ export class SoftWikiClient
 		return this.cache.tags[data.id];
 	}
 
-	private _apiResponseToProject(data: ProjectApiData): Project
+	private _apiResponseToCategory(data: CategoryApiData): Category
 	{
-		this.cache.projects[data.id] = new Project(data, this);
-		return this.cache.projects[data.id];
+		this.cache.categories[data.id] = new Category(data, this);
+		return this.cache.categories[data.id];
 	}
 }
 

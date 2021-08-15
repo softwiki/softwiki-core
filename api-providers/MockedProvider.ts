@@ -1,19 +1,19 @@
 /* eslint @typescript-eslint/no-unused-vars: off */
 
 import { TagData, NoteData } from "../models";
-import Api, { NoteApiData, ProjectApiData, TagApiData } from "./Api";
-import { ProjectData } from "../models/Project";
+import Api, { NoteApiData, CategoryApiData, TagApiData } from "./Api";
+import { CategoryData } from "../models/Category";
 
 export interface ICollections
 {
 	notes: NoteApiData[]
 	tags: TagApiData[]
-	projects: ProjectApiData[]
+	categories: CategoryApiData[]
 }
 
 export default class FakeDataProvider extends Api
 {
-	collections: ICollections = {notes: [], tags: [], projects: []}
+	collections: ICollections = {notes: [], tags: [], categories: []}
 
 	nextId = 0;
 
@@ -55,17 +55,17 @@ export default class FakeDataProvider extends Api
 	public async deleteTag(id: string): Promise<void> {}
 	public async updateTag(id: string, data: TagApiData): Promise<void> {}
 
-	public async createProject(document: ProjectData): Promise<ProjectApiData>
+	public async createCategory(document: CategoryData): Promise<CategoryApiData>
 	{
 		this.nextId++;
 		return {...document, id: this.nextId.toString()};
 	}
 
-	public async getProjects(): Promise<ProjectApiData[]>
+	public async getCategories(): Promise<CategoryApiData[]>
 	{
-		return this.collections.projects;
+		return this.collections.categories;
 	}
 
-	public async deleteProject(id: string): Promise<void> {}
-	public async updateProject(id: string, data: ProjectApiData): Promise<void> {}
+	public async deleteCategory(id: string): Promise<void> {}
+	public async updateCategory(id: string, data: CategoryApiData): Promise<void> {}
 }

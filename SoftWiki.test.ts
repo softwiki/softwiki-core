@@ -5,7 +5,7 @@ import MockedDataProvider, {ICollections} from "./api-providers/MockedProvider";
 
 describe("Frequent cases", () => 
 {
-	const mockedDataProvider: Api = new MockedDataProvider({notes: [], tags: [], projects: []});
+	const mockedDataProvider: Api = new MockedDataProvider({notes: [], tags: [], categories: []});
 	const dataApi = new SoftWikiClient({provider: mockedDataProvider});
 
 	beforeAll(async () =>
@@ -25,7 +25,7 @@ describe("Frequent cases", () =>
 	
 		test("Add a note, but previous note list is still be empty", async () => 
 		{
-			await dataApi.createNote({title: "Note 1", content: "test", tags: [], project: undefined});
+			await dataApi.createNote({title: "Note 1", content: "test", tags: [], category: undefined});
 			expect(notes).toHaveLength(0);
 		});
 	
@@ -41,14 +41,14 @@ describe("Frequent cases", () =>
 		test("Second note", async () => 
 		{
 			expect(dataApi.notes).toHaveLength(1);
-			await dataApi.createNote({title: "Note 2", content: "test", tags: [], project: undefined});
+			await dataApi.createNote({title: "Note 2", content: "test", tags: [], category: undefined});
 			expect(dataApi.notes).toHaveLength(2);
 		});
 
 		test("Third note", async () => 
 		{
 			expect(dataApi.notes).toHaveLength(2);
-			await dataApi.createNote({title: "Note 3", content: "test", tags: [], project: undefined});
+			await dataApi.createNote({title: "Note 3", content: "test", tags: [], category: undefined});
 			expect(dataApi.notes).toHaveLength(3);
 		});
 	});
@@ -165,16 +165,16 @@ describe("Tags", () =>
 {
 	const fakeData: ICollections = {
 		notes: [
-			{title: "First note", content: "Amazing content", tags: [], id: "1", project: undefined},
-			{title: "Second note", content: "Amazing content", tags: ["1"], id: "2", project: undefined},
-			{title: "Third note", content: "Amazing content", tags: ["1", "2"], id: "3", project: undefined}
+			{title: "First note", content: "Amazing content", tags: [], id: "1", category: undefined},
+			{title: "Second note", content: "Amazing content", tags: ["1"], id: "2", category: undefined},
+			{title: "Third note", content: "Amazing content", tags: ["1", "2"], id: "3", category: undefined}
 		],
 		tags: [
 			{name: "First tag", color: {r: 20, g: 20, b: 20, a: 1}, id: "1"},
 			{name: "Second tag", color: {r: 20, g: 20, b: 20, a: 1}, id: "2"},
 			{name: "Third tag", color: {r: 20, g: 20, b: 20, a: 1}, id: "3"}
 		],
-		projects: []
+		categories: []
 	};
 
 	let dataApi: SoftWikiClient;

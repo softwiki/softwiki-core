@@ -1,42 +1,42 @@
 import { SoftWikiError } from "../../errors";
-import { ProjectData } from "../../models";
-import { ProjectApiData } from "../Api";
+import { CategoryData } from "../../models";
+import { CategoryApiData } from "../Api";
 import ApiHandlerBase from "./ApiHandlerBase";
 import VirtualFileSystem from "./VirtualFileSystem";
 import FileSystemApiProvider, { FileSystemApiCache } from "./FileSystemApiProvider";
 
-export default class ProjectsApiHandler extends ApiHandlerBase
+export default class CategoriesApiHandler extends ApiHandlerBase
 {
 	constructor(virtualFileSystem: VirtualFileSystem, cache: FileSystemApiCache, parent: FileSystemApiProvider)
 	{
 		super(virtualFileSystem, cache, parent);
 	}
 	
-	public async createProject(data: ProjectData): Promise<ProjectApiData>
+	public async createCategory(data: CategoryData): Promise<CategoryApiData>
 	{
 		const directory = await this._virtualFileSystem.notes.createDirectory(data.name);
 		return {...data, id: directory.id};
 	}
 
-	public async getProjects(): Promise<ProjectApiData[]>
+	public async getCategories(): Promise<CategoryApiData[]>
 	{
-		const projects = [];
+		const categories = [];
 
 		for (const [directoryId, directory] of Object.entries(this._virtualFileSystem.notes.directories))
 		{
 			if (directory.name === ".")
 				continue ;
 
-			projects.push({
+			categories.push({
 				id: directoryId,
 				name: directory.name,
 				notes: Object.keys(directory.files)
 			});
 		}
-		return projects;
+		return categories;
 	}
 
-	public async deleteProject(id: string): Promise<void>
+	public async deleteCategory(id: string): Promise<void>
 	{
 		const directory = this._virtualFileSystem.notes.getDirectoryById(id);
 		if (!directory)
@@ -44,19 +44,19 @@ export default class ProjectsApiHandler extends ApiHandlerBase
 		await directory.delete();
 	}
 
-	public async updateProject(id: string, data: ProjectData): Promise<void>
+	public async updateCategory(id: string, data: CategoryData): Promise<void>
 	{
 		const directory = this._virtualFileSystem.notes.getDirectoryById(id);
 		if (!directory)
 			throw new Error("Directory with id " + id + " doesn't exist");
 
-		const project = this._clientCache.projects[id];
-		if (!project)
+		const category = this._clientCache.categories[id];
+		if (!category)
 		{
-			throw new Error("Project with id " + id + " doesn't exist in cache");
+			throw new Error("Category with id " + id + " doesn't exist in cache");
 		}
 
-		const oldData = project.getDataCopy();
+		const oldData = category.getDataCopy();
 		if (oldData.name !== data.name)
 		{
 			await directory.rename(data.name);

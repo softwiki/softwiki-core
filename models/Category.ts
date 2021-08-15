@@ -1,18 +1,18 @@
 import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
-import { ProjectApiData } from "../api-providers/Api";
+import { CategoryApiData } from "../api-providers/Api";
 import { Note } from "./Note";
 import { Base } from "./Base";
 
-export interface ProjectData
+export interface CategoryData
 {
 	name: string
 }
 
-export class Project extends Base
+export class Category extends Base
 {
-	private _data: ProjectData
+	private _data: CategoryData
 
-	constructor(data: ProjectApiData, client: SoftWikiClient)
+	constructor(data: CategoryApiData, client: SoftWikiClient)
 	{
 		super(data.id, client);
 		this._data = data;
@@ -20,9 +20,9 @@ export class Project extends Base
 
 	public async setName(name: string): Promise<void>
 	{
-		await this._api.updateProject(this._id, {...this._data, name});
+		await this._api.updateCategory(this._id, {...this._data, name});
 		this._data.name = name;
-		this._client.run(DataEvent.ProjectsUpdated, {project: this});
+		this._client.run(DataEvent.CategoriesUpdated, {category: this});
 	}
 
 	public getName(): string
@@ -39,18 +39,18 @@ export class Project extends Base
 	{
 		return Object.values(this._client.cache.notes).filter((note: Note) => 
 		{
-			return note.belongToProject(this);
+			return note.belongToCategory(this);
 		});
 	}
 
 	public async delete(): Promise<void>
 	{
-		await this._api.deleteProject(this.getId());
-		delete this._client.cache.projects[this._id];
-		this._client.run(DataEvent.ProjectsUpdated, {project: this});
+		await this._api.deleteCategory(this.getId());
+		delete this._client.cache.categories[this._id];
+		this._client.run(DataEvent.CategoriesUpdated, {category: this});
 	}
 	
-	public getDataCopy(): ProjectData
+	public getDataCopy(): CategoryData
 	{
 		return JSON.parse(JSON.stringify(this._data));
 	}

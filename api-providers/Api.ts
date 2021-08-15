@@ -1,6 +1,6 @@
 import SoftWikiClient from "../SoftWikiClient";
 import { TagData as TagData, NoteData as NoteData} from "../models";
-import { ProjectData as ProjectData } from "../models/Project";
+import { CategoryData as CategoryData } from "../models/Category";
 
 export interface ApiObjectBase
 {
@@ -9,7 +9,7 @@ export interface ApiObjectBase
 
 export interface NoteApiData extends ApiObjectBase, NoteData {}
 export interface TagApiData extends ApiObjectBase, TagData {}
-export interface ProjectApiData extends ApiObjectBase, ProjectData {}
+export interface CategoryApiData extends ApiObjectBase, CategoryData {}
 
 export default abstract class Api
 {
@@ -25,10 +25,10 @@ export default abstract class Api
 	public abstract deleteTag(id: string): Promise<void>
 	public abstract updateTag(id: string, data: TagData): Promise<void>
 
-	public abstract createProject(data: ProjectData): Promise<ProjectApiData>
-	public abstract getProjects(): Promise<ProjectApiData[]>
-	public abstract deleteProject(id: string): Promise<void>
-	public abstract updateProject(id: string, data: ProjectData): Promise<void>
+	public abstract createCategory(data: CategoryData): Promise<CategoryApiData>
+	public abstract getCategories(): Promise<CategoryApiData[]>
+	public abstract deleteCategory(id: string): Promise<void>
+	public abstract updateCategory(id: string, data: CategoryData): Promise<void>
 
 	public client: SoftWikiClient = {} as SoftWikiClient
 }
