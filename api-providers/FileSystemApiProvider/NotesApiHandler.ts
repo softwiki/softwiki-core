@@ -5,6 +5,7 @@ import { NoteApiData } from "../Api";
 import ApiHandlerBase from "./ApiHandlerBase";
 import VirtualFileSystem from "./VirtualFileSystem";
 import FileSystemApiProvider, { FileSystemApiCache } from "./FileSystemApiProvider";
+import { getForbiddenSequence } from "./helper";
 
 export default class NotesApiHandler extends ApiHandlerBase
 {
@@ -15,6 +16,9 @@ export default class NotesApiHandler extends ApiHandlerBase
 	
 	public async createNote(data: NoteData): Promise<NoteApiData>
 	{
+		const forbiddenSequence = getForbiddenSequence(data.title);
+		if (forbiddenSequence)
+			throw new SoftWikiError(`The character sequence "${forbiddenSequence}" is not allowed in title`);
 		const file = this._virtualFileSystem.notes.addFile(data.title);
 		await file.write(data.content);
 		this._cache.notes[file.id] = {meta: {}};
@@ -70,6 +74,9 @@ export default class NotesApiHandler extends ApiHandlerBase
 
 		if (oldData.title !== data.title)
 		{
+			const forbiddenSequence = getForbiddenSequence(data.title);
+			if (forbiddenSequence)
+				throw new SoftWikiError(`The character sequence "${forbiddenSequence}" is not allowed in title`);
 			file = await file.rename(data.title);
 		}
 

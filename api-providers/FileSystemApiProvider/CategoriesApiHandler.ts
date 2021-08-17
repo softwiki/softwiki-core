@@ -4,6 +4,7 @@ import { CategoryApiData } from "../Api";
 import ApiHandlerBase from "./ApiHandlerBase";
 import VirtualFileSystem from "./VirtualFileSystem";
 import FileSystemApiProvider, { FileSystemApiCache } from "./FileSystemApiProvider";
+import { getForbiddenSequence } from "./helper";
 
 export default class CategoriesApiHandler extends ApiHandlerBase
 {
@@ -14,6 +15,9 @@ export default class CategoriesApiHandler extends ApiHandlerBase
 	
 	public async createCategory(data: CategoryData): Promise<CategoryApiData>
 	{
+		const forbiddenSequence = getForbiddenSequence(data.name);
+		if (forbiddenSequence)
+			throw new SoftWikiError(`The character sequence "${forbiddenSequence}" is not allowed in category name`);
 		const directory = await this._virtualFileSystem.notes.createDirectory(data.name);
 		return {...data, id: directory.id};
 	}
@@ -46,6 +50,10 @@ export default class CategoriesApiHandler extends ApiHandlerBase
 
 	public async updateCategory(id: string, data: CategoryData): Promise<void>
 	{
+		const forbiddenSequence = getForbiddenSequence(data.name);
+		if (forbiddenSequence)
+			throw new SoftWikiError(`The character sequence "${forbiddenSequence}" is not allowed in category name`);
+
 		const directory = this._virtualFileSystem.notes.getDirectoryById(id);
 		if (!directory)
 			throw new Error("Directory with id " + id + " doesn't exist");
