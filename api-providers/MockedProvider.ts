@@ -1,8 +1,8 @@
 /* eslint @typescript-eslint/no-unused-vars: off */
 
-import { TagData, NoteData } from "../models";
+import { TagData, NoteData } from "../objects";
 import Api, { NoteApiData, CategoryApiData, TagApiData } from "./Api";
-import { CategoryData } from "../models/Category";
+import { CategoryData } from "../objects/Category";
 
 export interface ICollections
 {

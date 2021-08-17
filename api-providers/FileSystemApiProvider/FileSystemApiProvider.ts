@@ -1,4 +1,4 @@
-import { NoteData, TagData, CategoryData } from "../../models";
+import { NoteData, TagData, CategoryData } from "../../objects";
 import Api, {NoteApiData, CategoryApiData, TagApiData} from "../Api";
 import VirtualFileSystem from "./VirtualFileSystem";
 import CategoriesApiHandler from "./CategoriesApiHandler";

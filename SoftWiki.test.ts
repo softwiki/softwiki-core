@@ -1,4 +1,4 @@
-import { Note, Tag } from "./models";
+import { Note, Tag } from "./objects";
 import { SoftWikiClient } from "./SoftWikiClient";
 import { Api } from "./api-providers";
 import MockedDataProvider, {ICollections} from "./api-providers/MockedProvider";

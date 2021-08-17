@@ -1,5 +1,5 @@
 import { SoftWikiError } from "../../errors";
-import { CategoryData } from "../../models";
+import { CategoryData } from "../../objects";
 import { CategoryApiData } from "../Api";
 import ApiHandlerBase from "./ApiHandlerBase";
 import VirtualFileSystem from "./VirtualFileSystem";

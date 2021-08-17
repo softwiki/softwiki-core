@@ -1,6 +1,6 @@
 import SoftWikiClient from "../SoftWikiClient";
-import { TagData as TagData, NoteData as NoteData} from "../models";
-import { CategoryData as CategoryData } from "../models/Category";
+import { TagData as TagData, NoteData as NoteData} from "../objects";
+import { CategoryData as CategoryData } from "../objects/Category";
 
 export interface ApiObjectBase
 {

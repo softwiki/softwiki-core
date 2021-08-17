@@ -1,6 +1,6 @@
 import { generateMarkdownWithMetadata, parseMarkdownMetadata } from "../../utils/markdown";
 import { SoftWikiError } from "../../errors";
-import { NoteData } from "../../models";
+import { NoteData } from "../../objects";
 import { NoteApiData } from "../Api";
 import ApiHandlerBase from "./ApiHandlerBase";
 import VirtualFileSystem from "./VirtualFileSystem";

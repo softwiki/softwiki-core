@@ -1,4 +1,4 @@
-import { NoteData, CategoryData, TagData } from "softwiki-core/models";
+import { NoteData, CategoryData, TagData } from "softwiki-core/objects";
 import { Api } from ".";
 import { NoteApiData, CategoryApiData, TagApiData } from "./Api";
 

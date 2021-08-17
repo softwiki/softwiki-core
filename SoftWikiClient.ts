@@ -1,6 +1,6 @@
-import { Note, NoteData } from "./models";
-import { Tag, TagData } from "./models";
-import { Category, CategoryData } from "./models";
+import { Note, NoteData } from "./objects";
+import { Tag, TagData } from "./objects";
+import { Category, CategoryData } from "./objects";
 
 import Api, { NoteApiData, CategoryApiData, TagApiData } from "./api-providers/Api";
 import { EventService } from "./services";

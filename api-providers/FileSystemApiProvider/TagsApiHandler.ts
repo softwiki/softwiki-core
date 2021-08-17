@@ -1,4 +1,4 @@
-import { Tag, TagData } from "../../models";
+import { Tag, TagData } from "../../objects";
 import { TagApiData } from "../Api";
 import ApiHandlerBase from "./ApiHandlerBase";
 import VirtualFileSystem from "./VirtualFileSystem";
