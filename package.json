@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "jest",
     "lint-style": "eslint .",
     "test-watch": "eslint . && jest --watch"

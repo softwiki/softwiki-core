@@ -113,7 +113,7 @@ export default class SQLiteProvider extends Api
 
 		for (const note of notes)
 		{
-			note.tagsId = note.tagsId ? (note.tagsId as unknown as string).split(",") : []
+			note.tagsId = note.tagsId ? (note.tagsId as unknown as string).split(",") : [];
 		}
 
 		return notes;
@@ -132,13 +132,13 @@ export default class SQLiteProvider extends Api
 
 	public async deleteNote(id: string): Promise<void>
 	{
-		await this._run(`DELETE FROM ${TABLE_NOTES} WHERE id = ${id}`)
+		await this._run(`DELETE FROM ${TABLE_NOTES} WHERE id = ${id}`);
 	}
 
 	public async createTag(properties: TagProperties): Promise<TagModel>
 	{
 		const sqlQuery = `INSERT INTO ${TABLE_TAGS} (name, color) VALUES ('${properties.name}', '${JSON.stringify(properties.color)}')`;
-		const runResult = await this._run(sqlQuery)
+		const runResult = await this._run(sqlQuery);
 		return {...properties, id: runResult.lastID.toString()};
 	}
 
@@ -146,8 +146,8 @@ export default class SQLiteProvider extends Api
 	{
 		const tagsRaw = await this._all(`
 			SELECT CAST(t.id AS VARCHAR) id, t.name, t.color 
-			FROM ${TABLE_TAGS} t`) as any[]
-		const tags: TagModel[] = tagsRaw.map((tagRaw) => {return {...tagRaw, color: JSON.parse(tagRaw.color)}});
+			FROM ${TABLE_TAGS} t`) as any[];
+		const tags: TagModel[] = tagsRaw.map((tagRaw) => {return {...tagRaw, color: JSON.parse(tagRaw.color)};});
 		return tags;
 	}
 
@@ -159,13 +159,13 @@ export default class SQLiteProvider extends Api
 
 	public async deleteTag(id: string): Promise<void>
 	{
-		await this._run(`DELETE FROM ${TABLE_TAGS} WHERE id = ${id}`)
-		await this._run(`DELETE FROM ${TABLE_LINK_NOTES_TAGS} WHERE tagId=${id}`)
+		await this._run(`DELETE FROM ${TABLE_TAGS} WHERE id = ${id}`);
+		await this._run(`DELETE FROM ${TABLE_LINK_NOTES_TAGS} WHERE tagId=${id}`);
 	}
 
 	public async addTagToNote(noteId: string, tagId: string): Promise<void>
 	{
-		await this._run(`INSERT OR IGNORE INTO ${TABLE_LINK_NOTES_TAGS} (noteId, tagId) VALUES (${noteId}, ${tagId})`)
+		await this._run(`INSERT OR IGNORE INTO ${TABLE_LINK_NOTES_TAGS} (noteId, tagId) VALUES (${noteId}, ${tagId})`);
 	}
 
 	public async removeTagFromNote(noteId: string, tagId: string): Promise<void>
@@ -175,7 +175,7 @@ export default class SQLiteProvider extends Api
 
 	public async createCategory(properties: CategoryProperties): Promise<CategoryModel>
 	{
-		const runResult = await this._run(`INSERT INTO ${TABLE_CATEGORIES} (name) VALUES ('${properties.name}')`)
+		const runResult = await this._run(`INSERT INTO ${TABLE_CATEGORIES} (name) VALUES ('${properties.name}')`);
 		return {...properties, id: runResult.lastID.toString()};
 	}
 
@@ -194,6 +194,6 @@ export default class SQLiteProvider extends Api
 
 	public async deleteCategory(id: string): Promise<void>
 	{
-		await this._run(`DELETE FROM ${TABLE_CATEGORIES} WHERE id = ${id}`)
+		await this._run(`DELETE FROM ${TABLE_CATEGORIES} WHERE id = ${id}`);
 	}
 }
