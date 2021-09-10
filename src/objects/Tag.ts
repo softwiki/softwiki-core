@@ -1,8 +1,8 @@
-import { TagApiData } from "../api-providers/Api";
+import { TagModel } from "../api-providers/Api";
 import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
 import { Base } from "./Base";
 
-export interface TagData
+export interface TagProperties
 {
 	name: string
 	color: Color
@@ -18,9 +18,9 @@ export interface Color
 
 export class Tag extends Base
 {
-	private _data: TagData
+	private _data: TagProperties
 
-	constructor(data: TagApiData, client: SoftWikiClient)
+	constructor(data: TagModel, client: SoftWikiClient)
 	{
 		super(data.id, client);
 		this._data = data;
@@ -40,7 +40,7 @@ export class Tag extends Base
 		this._client.run(DataEvent.TagsUpdated, {tag: this});
 	}
 
-	public async setAll(properties: TagData): Promise<void>
+	public async setAll(properties: TagProperties): Promise<void>
 	{
 		await this._api.updateTag(this._id, {...this._data, ...properties});
 		this._data.name = properties.name;

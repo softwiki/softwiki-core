@@ -11,13 +11,20 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/jest": "^26.0.24",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.9.0",
     "@typescript-eslint/eslint-plugin": "^4.28.5",
     "@typescript-eslint/parser": "^4.28.5",
     "eslint": "^7.32.0",
-    "jest": "^27.0.6",
-    "ts-jest": "^27.0.4",
+    "jest": "^27.1.1",
+    "ts-jest": "^27.0.5",
     "typescript": "^4.3.5"
   },
-  "eslintIgnore": ["jest.config.js"]
+  "eslintIgnore": [
+    "jest.config.js"
+  ],
+  "dependencies": {
+    "@types/sqlite3": "^3.1.7",
+    "sqlite3": "^5.0.2"
+  }
 }

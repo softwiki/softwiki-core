@@ -1,13 +1,13 @@
-import { NoteData, CategoryData, TagData } from "softwiki-core/objects";
+import { NoteProperties, CategoryProperties, TagProperties } from "../objects";
 import { Api } from ".";
-import { NoteApiData, CategoryApiData, TagApiData } from "./Api";
+import { NoteModel, CategoryModel, TagModel } from "./Api";
 
 interface ICollections
 {
-	[index: string]: NoteApiData[] | TagApiData[] | CategoryApiData[]
-	notes: NoteApiData[]
-	tags: TagApiData[]
-	categories: CategoryApiData[]
+	[index: string]: NoteModel[] | TagModel[] | CategoryModel[]
+	notes: NoteModel[]
+	tags: TagModel[]
+	categories: CategoryModel[]
 }
 
 const COLLECTION_NOTES = "notes";
@@ -52,18 +52,18 @@ export default class JsonApiProvider extends Api
 		}
 	}
 
-	public async createNote(properties: NoteData): Promise<NoteApiData>
+	public async createNote(properties: NoteProperties): Promise<NoteModel>
 	{
 		const documentDB = this._createDocument(properties);
 		const collection = this._getCollection(COLLECTION_NOTES);
 
 		collection.push(documentDB);
 		await this._saveDatabase();
-		return clone(documentDB) as NoteApiData;
+		return clone(documentDB) as NoteModel;
 	}
 	
 	private _didSetup = false;
-	public async getNotes(): Promise<NoteApiData[]>
+	public async getNotes(): Promise<NoteModel[]>
 	{
 		if (!this._didSetup)
 		{
@@ -75,7 +75,7 @@ export default class JsonApiProvider extends Api
 
 	public async deleteNote(id: string): Promise<void>
 	{
-		const collection = this._getCollection<NoteApiData>(COLLECTION_NOTES);
+		const collection = this._getCollection<NoteModel>(COLLECTION_NOTES);
 		const index = this._getIndexInCollectionByID(COLLECTION_NOTES, id);
 
 		if (index !== -1)
@@ -86,9 +86,9 @@ export default class JsonApiProvider extends Api
 		}
 	}
 
-	public async updateNote(id: string, data: NoteData): Promise<void>
+	public async updateNote(id: string, data: NoteProperties): Promise<void>
 	{
-		const collection = this._getCollection<NoteApiData>(COLLECTION_NOTES);
+		const collection = this._getCollection<NoteModel>(COLLECTION_NOTES);
 		const index = this._getIndexInCollectionByID(COLLECTION_NOTES, id);
 		
 		if (index !== -1)
@@ -100,41 +100,41 @@ export default class JsonApiProvider extends Api
 	
 	public async removeTagFromNote(noteId: string, tagId: string): Promise<void>
 	{
-		const collection = this._getCollection<NoteApiData>(COLLECTION_NOTES);
+		const collection = this._getCollection<NoteModel>(COLLECTION_NOTES);
 		const index = this._getIndexInCollectionByID(COLLECTION_NOTES, noteId);
-		const tagIndex = collection[index].tags.indexOf(tagId);
+		const tagIndex = collection[index].tagsId.indexOf(tagId);
 
-		collection[index].tags.splice(tagIndex, 1);
+		collection[index].tagsId.splice(tagIndex, 1);
 		await this._saveDatabase();
 	}
 
 	public async addTagToNote(noteId: string, tagId: string): Promise<void>
 	{
-		const collection = this._getCollection<NoteApiData>(COLLECTION_NOTES);
+		const collection = this._getCollection<NoteModel>(COLLECTION_NOTES);
 		const index = this._getIndexInCollectionByID(COLLECTION_NOTES, noteId);
 
-		collection[index].tags.push(tagId);
+		collection[index].tagsId.push(tagId);
 		await this._saveDatabase();
 	}
 
-	public async createTag(document: TagData): Promise<TagApiData>
+	public async createTag(document: TagProperties): Promise<TagModel>
 	{
 		const documentDB = this._createDocument(document);
 		const collection = this._getCollection(COLLECTION_TAGS);
 
 		collection.push(documentDB);
 		await this._saveDatabase();
-		return clone(documentDB) as TagApiData;
+		return clone(documentDB) as TagModel;
 	}
 
-	public async getTags(): Promise<TagApiData[]>
+	public async getTags(): Promise<TagModel[]>
 	{
 		return clone(this._getCollection(COLLECTION_TAGS));
 	}
 
 	public async deleteTag(id: string): Promise<void>
 	{
-		const collection = this._getCollection<TagApiData>(COLLECTION_TAGS);
+		const collection = this._getCollection<TagModel>(COLLECTION_TAGS);
 		const index = this._getIndexInCollectionByID(COLLECTION_TAGS, id);
 
 		if (index !== -1)
@@ -145,9 +145,9 @@ export default class JsonApiProvider extends Api
 		}
 	}
 
-	public async updateTag(id: string, data: TagData): Promise<void>
+	public async updateTag(id: string, data: TagProperties): Promise<void>
 	{
-		const collection = this._getCollection<TagApiData>(COLLECTION_TAGS);
+		const collection = this._getCollection<TagModel>(COLLECTION_TAGS);
 		const index = this._getIndexInCollectionByID(COLLECTION_TAGS, id);
 		
 		if (index !== -1)
@@ -160,24 +160,24 @@ export default class JsonApiProvider extends Api
 
 	// ---
 
-	public async createCategory(document: CategoryData): Promise<CategoryApiData>
+	public async createCategory(document: CategoryProperties): Promise<CategoryModel>
 	{
 		const documentDB = this._createDocument(document);
 		const collection = this._getCollection(COLLECTION_PROJECTS);
 
 		collection.push(documentDB);
 		await this._saveDatabase();
-		return clone(documentDB) as CategoryApiData;
+		return clone(documentDB) as CategoryModel;
 	}
 
-	public async getCategories(): Promise<CategoryApiData[]>
+	public async getCategories(): Promise<CategoryModel[]>
 	{
 		return clone(this._getCollection(COLLECTION_PROJECTS));
 	}
 
 	public async deleteCategory(id: string): Promise<void>
 	{
-		const collection = this._getCollection<CategoryApiData>(COLLECTION_PROJECTS);
+		const collection = this._getCollection<CategoryModel>(COLLECTION_PROJECTS);
 		const index = this._getIndexInCollectionByID(COLLECTION_PROJECTS, id);
 
 		if (index !== -1)
@@ -188,9 +188,9 @@ export default class JsonApiProvider extends Api
 		}
 	}
 
-	public async updateCategory(id: string, data: CategoryData): Promise<void>
+	public async updateCategory(id: string, data: CategoryProperties): Promise<void>
 	{
-		const collection = this._getCollection<CategoryApiData>(COLLECTION_PROJECTS);
+		const collection = this._getCollection<CategoryModel>(COLLECTION_PROJECTS);
 		const index = this._getIndexInCollectionByID(COLLECTION_PROJECTS, id);
 		
 		if (index !== -1)

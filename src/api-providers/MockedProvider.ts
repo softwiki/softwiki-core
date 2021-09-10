@@ -1,14 +1,14 @@
 /* eslint @typescript-eslint/no-unused-vars: off */
 
-import { TagData, NoteData } from "../objects";
-import Api, { NoteApiData, CategoryApiData, TagApiData } from "./Api";
-import { CategoryData } from "../objects/Category";
+import { TagProperties, NoteProperties } from "../objects";
+import Api, { NoteModel, CategoryModel, TagModel } from "./Api";
+import { CategoryProperties } from "../objects/Category";
 
 export interface ICollections
 {
-	notes: NoteApiData[]
-	tags: TagApiData[]
-	categories: CategoryApiData[]
+	notes: NoteModel[]
+	tags: TagModel[]
+	categories: CategoryModel[]
 }
 
 export default class FakeDataProvider extends Api
@@ -25,47 +25,47 @@ export default class FakeDataProvider extends Api
 
 	public async setup(): Promise<void> {}
 
-	public async createNote(properties: NoteData): Promise<NoteApiData>
+	public async createNote(properties: NoteProperties): Promise<NoteModel>
 	{
 		this.nextId++;
 		return {...properties, id: this.nextId.toString()};
 	}
 
-	public async getNotes(): Promise<NoteApiData[]>
+	public async getNotes(): Promise<NoteModel[]>
 	{
 		return this.collections.notes;
 	}
 
 	public async deleteNote(id: string): Promise<void> {}
-	public async updateNote(id: string, data: NoteApiData): Promise<void> {}
+	public async updateNote(id: string, data: NoteModel): Promise<void> {}
 	public async removeTagFromNote(noteId: string, tagId: string): Promise<void> {}
 	public async addTagToNote(id: string, tagId: string): Promise<void> {}
 
-	public async createTag(document: TagData): Promise<TagApiData>
+	public async createTag(document: TagProperties): Promise<TagModel>
 	{
 		this.nextId++;
 		return {...document, id: this.nextId.toString()};
 	}
 
-	public async getTags(): Promise<TagApiData[]>
+	public async getTags(): Promise<TagModel[]>
 	{
 		return this.collections.tags;
 	}
 
 	public async deleteTag(id: string): Promise<void> {}
-	public async updateTag(id: string, data: TagApiData): Promise<void> {}
+	public async updateTag(id: string, data: TagModel): Promise<void> {}
 
-	public async createCategory(document: CategoryData): Promise<CategoryApiData>
+	public async createCategory(document: CategoryProperties): Promise<CategoryModel>
 	{
 		this.nextId++;
 		return {...document, id: this.nextId.toString()};
 	}
 
-	public async getCategories(): Promise<CategoryApiData[]>
+	public async getCategories(): Promise<CategoryModel[]>
 	{
 		return this.collections.categories;
 	}
 
 	public async deleteCategory(id: string): Promise<void> {}
-	public async updateCategory(id: string, data: CategoryApiData): Promise<void> {}
+	public async updateCategory(id: string, data: CategoryModel): Promise<void> {}
 }

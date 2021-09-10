@@ -1,7 +1,7 @@
 import { generateMarkdownWithMetadata, parseMarkdownMetadata } from "../../utils/markdown";
 import { SoftWikiError } from "../../errors";
-import { NoteData } from "../../objects";
-import { NoteApiData } from "../Api";
+import { NoteProperties } from "../../objects";
+import { NoteModel } from "../Api";
 import ApiHandlerBase from "./ApiHandlerBase";
 import VirtualFileSystem from "./VirtualFileSystem";
 import FileSystemApiProvider, { FileSystemApiCache } from "./FileSystemApiProvider";
@@ -14,19 +14,22 @@ export default class NotesApiHandler extends ApiHandlerBase
 		super(virtualFileSystem, cache, parent);
 	}
 	
-	public async createNote(data: NoteData): Promise<NoteApiData>
+	public async createNote(data: NoteProperties): Promise<NoteModel>
 	{
 		const forbiddenSequence = getForbiddenSequence(data.title);
 		if (forbiddenSequence)
 			throw new SoftWikiError(`The character sequence "${forbiddenSequence}" is not allowed in title`);
-		const file = this._virtualFileSystem.notes.addFile(data.title);
+		let directory = this._virtualFileSystem.notes;
+		if (data.categoryId)
+			directory = this._virtualFileSystem.notes.getDirectoryById(data.categoryId) ?? this._virtualFileSystem.notes;
+		const file = directory.addFile(data.title);
 		await file.write(data.content);
 		this._cache.notes[file.id] = {meta: {}};
 
 		return {...data, id: file.id};
 	}
 	
-	public async getNotes(): Promise<NoteApiData[]>
+	public async getNotes(): Promise<NoteModel[]>
 	{
 		const notes = [];
 
@@ -44,8 +47,8 @@ export default class NotesApiHandler extends ApiHandlerBase
 					id: fileId,
 					title: file.name,
 					content: md.content,
-					tags: tagsId,
-					category: directory.id
+					tagsId: tagsId,
+					categoryId: directory.id
 				});
 			}
 		}
@@ -60,7 +63,7 @@ export default class NotesApiHandler extends ApiHandlerBase
 		await file.delete();
 	}
 	
-	public async updateNote(id: string, data: NoteData): Promise<void>
+	public async updateNote(id: string, data: NoteProperties): Promise<void>
 	{
 		const oldNote = this._clientCache.notes[id];
 		if (oldNote === undefined)
@@ -80,9 +83,9 @@ export default class NotesApiHandler extends ApiHandlerBase
 			file = await file.rename(data.title);
 		}
 
-		if (oldData.category !== data.category)
+		if (oldData.categoryId !== data.categoryId)
 		{
-			const directoryId = data.category ?? this._virtualFileSystem.notes.id;
+			const directoryId = data.categoryId ?? this._virtualFileSystem.notes.id;
 			const directory = this._virtualFileSystem.notes.getDirectoryById(directoryId);
 			if (!directory)
 				throw new SoftWikiError("Directory with id " + directoryId + " doesn't exist");
@@ -91,7 +94,7 @@ export default class NotesApiHandler extends ApiHandlerBase
 		
 		const content = generateMarkdownWithMetadata(data.content, {
 			...this._cache.notes[id].meta,
-			tags: this._tagDataToString(data.tags)
+			tags: this._tagDataToString(data.tagsId)
 		});
 
 		await file.write(content);
@@ -101,14 +104,14 @@ export default class NotesApiHandler extends ApiHandlerBase
 	{
 		const note = this._clientCache.notes[noteId];
 		const data = note.getDataCopy();
-		const index = data.tags.indexOf(tagId);
+		const index = data.tagsId.indexOf(tagId);
 		if (index !== -1)
 		{
-			data.tags.splice(index, 1);
+			data.tagsId.splice(index, 1);
 		}
 		const file = this._virtualFileSystem.notes.getFileById(noteId);
 		await file?.write(generateMarkdownWithMetadata(data.content, {
-			tags: this._tagDataToString(data.tags)
+			tags: this._tagDataToString(data.tagsId)
 		}));
 	}
 
@@ -116,10 +119,10 @@ export default class NotesApiHandler extends ApiHandlerBase
 	{
 		const note = this._clientCache.notes[noteId];
 		const data = note.getDataCopy();
-		data.tags.push(tagId);
+		data.tagsId.push(tagId);
 		const file = this._virtualFileSystem.notes.getFileById(noteId);
 		await file?.write(generateMarkdownWithMetadata(data.content, {
-			tags: this._tagDataToString(data.tags)
+			tags: this._tagDataToString(data.tagsId)
 		}));
 	}
 

@@ -25,7 +25,7 @@ describe("Frequent cases", () =>
 	
 		test("Add a note, but previous note list is still be empty", async () => 
 		{
-			await dataApi.createNote({title: "Note 1", content: "test", tags: [], category: undefined});
+			await dataApi.createNote({title: "Note 1", content: "test", tagsId: [], categoryId: undefined});
 			expect(notes).toHaveLength(0);
 		});
 	
@@ -41,14 +41,14 @@ describe("Frequent cases", () =>
 		test("Second note", async () => 
 		{
 			expect(dataApi.notes).toHaveLength(1);
-			await dataApi.createNote({title: "Note 2", content: "test", tags: [], category: undefined});
+			await dataApi.createNote({title: "Note 2", content: "test", tagsId: [], categoryId: undefined});
 			expect(dataApi.notes).toHaveLength(2);
 		});
 
 		test("Third note", async () => 
 		{
 			expect(dataApi.notes).toHaveLength(2);
-			await dataApi.createNote({title: "Note 3", content: "test", tags: [], category: undefined});
+			await dataApi.createNote({title: "Note 3", content: "test", tagsId: [], categoryId: undefined});
 			expect(dataApi.notes).toHaveLength(3);
 		});
 	});
@@ -165,9 +165,9 @@ describe("Tags", () =>
 {
 	const fakeData: ICollections = {
 		notes: [
-			{title: "First note", content: "Amazing content", tags: [], id: "1", category: undefined},
-			{title: "Second note", content: "Amazing content", tags: ["1"], id: "2", category: undefined},
-			{title: "Third note", content: "Amazing content", tags: ["1", "2"], id: "3", category: undefined}
+			{title: "First note", content: "Amazing content", tagsId: [], id: "1", categoryId: undefined},
+			{title: "Second note", content: "Amazing content", tagsId: ["1"], id: "2", categoryId: undefined},
+			{title: "Third note", content: "Amazing content", tagsId: ["1", "2"], id: "3", categoryId: undefined}
 		],
 		tags: [
 			{name: "First tag", color: {r: 20, g: 20, b: 20, a: 1}, id: "1"},

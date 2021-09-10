@@ -1,25 +1,25 @@
 import { Tag } from "./Tag";
 import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
 import { Category } from "./Category";
-import { NoteApiData } from "../api-providers/Api";
+import { NoteModel } from "../api-providers/Api";
 import { Base } from "./Base";
 
-export interface NoteData
+export interface NoteProperties
 {
 	title: string
 	content: string
-	tags: string[]
-	category: string | undefined
+	tagsId: string[]
+	categoryId: string | undefined
 }
 
 export class Note extends Base
 {
-	private _data: NoteData
+	private _data: NoteProperties
 
-	constructor(data: NoteApiData, client: SoftWikiClient)
+	constructor(data: NoteModel, client: SoftWikiClient)
 	{
 		super(data.id, client);
-		this._data = {title: data.title, content: data.content, tags: [...data.tags], category: data.category};
+		this._data = {title: data.title, content: data.content, tagsId: [...data.tagsId], categoryId: data.categoryId};
 	}
 
 	public async setTitle(title: string): Promise<void>
@@ -38,27 +38,27 @@ export class Note extends Base
 	
 	public async setCategory(category: Category | null): Promise<void>
 	{
-		await this._api.updateNote(this._id, {...this._data, category: category ? category.getId() : undefined});
-		this._data.category = category !== null ? category.getId() : undefined;
+		await this._api.updateNote(this._id, {...this._data, categoryId: category ? category.getId() : undefined});
+		this._data.categoryId = category !== null ? category.getId() : undefined;
 		this._client.run(DataEvent.NotesUpdated, {note: this});
 	}
 
 	public async addTag(tag: Tag): Promise<void>
 	{
-		if (this._data.tags.indexOf(tag.getId()) !== -1)
+		if (this._data.tagsId.indexOf(tag.getId()) !== -1)
 			return ;
 		await this._api.addTagToNote(this._id, tag.getId());
-		this._data.tags.push(tag.getId());
+		this._data.tagsId.push(tag.getId());
 		this._client.run(DataEvent.NotesUpdated, {note: this});
 	}
 
 	public async removeTag(tag: Tag): Promise<void>
 	{
-		const index = this._data.tags.indexOf(tag.getId());
+		const index = this._data.tagsId.indexOf(tag.getId());
 		if (index === -1)
 			return ;
 		await this._api.removeTagFromNote(this._id, tag.getId());
-		this._data.tags.splice(index, 1);
+		this._data.tagsId.splice(index, 1);
 		this._client.run(DataEvent.NotesUpdated, {note: this});
 	}
 
@@ -74,23 +74,23 @@ export class Note extends Base
 
 	public getTags(): Tag[]
 	{
-		return this._data.tags.map((tagId: string) => this._client.cache.tags[tagId]).filter((tag: Tag) => tag !== undefined);
+		return this._data.tagsId.map((tagId: string) => this._client.cache.tags[tagId]).filter((tag: Tag) => tag !== undefined);
 	}
 
 	public belongToCategory(category: Category): boolean
 	{
-		return category.getId() == this._data.category;
+		return category.getId() == this._data.categoryId;
 	}
 
 	public getCategory(): Category | undefined
 	{
-		if (this._data.category)
-			return this._client.cache.categories[this._data.category];
+		if (this._data.categoryId)
+			return this._client.cache.categories[this._data.categoryId];
 	}
 
 	public hasTag(tag: Tag): boolean
 	{
-		return this._data.tags.indexOf(tag.getId()) !== -1;
+		return this._data.tagsId.indexOf(tag.getId()) !== -1;
 	}
 
 	public async delete(): Promise<void>
@@ -100,7 +100,7 @@ export class Note extends Base
 		this._client.run(DataEvent.NotesUpdated, {note: this});
 	}
 	
-	public getDataCopy(): NoteData
+	public getDataCopy(): NoteProperties
 	{
 		return JSON.parse(JSON.stringify(this._data));
 	}

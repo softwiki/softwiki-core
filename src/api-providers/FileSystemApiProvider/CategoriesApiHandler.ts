@@ -1,6 +1,6 @@
 import { SoftWikiError } from "../../errors";
-import { CategoryData } from "../../objects";
-import { CategoryApiData } from "../Api";
+import { CategoryProperties } from "../../objects";
+import { CategoryModel } from "../Api";
 import ApiHandlerBase from "./ApiHandlerBase";
 import VirtualFileSystem from "./VirtualFileSystem";
 import FileSystemApiProvider, { FileSystemApiCache } from "./FileSystemApiProvider";
@@ -13,7 +13,7 @@ export default class CategoriesApiHandler extends ApiHandlerBase
 		super(virtualFileSystem, cache, parent);
 	}
 	
-	public async createCategory(data: CategoryData): Promise<CategoryApiData>
+	public async createCategory(data: CategoryProperties): Promise<CategoryModel>
 	{
 		const forbiddenSequence = getForbiddenSequence(data.name);
 		if (forbiddenSequence)
@@ -22,7 +22,7 @@ export default class CategoriesApiHandler extends ApiHandlerBase
 		return {...data, id: directory.id};
 	}
 
-	public async getCategories(): Promise<CategoryApiData[]>
+	public async getCategories(): Promise<CategoryModel[]>
 	{
 		const categories = [];
 
@@ -48,7 +48,7 @@ export default class CategoriesApiHandler extends ApiHandlerBase
 		await directory.delete();
 	}
 
-	public async updateCategory(id: string, data: CategoryData): Promise<void>
+	public async updateCategory(id: string, data: CategoryProperties): Promise<void>
 	{
 		const forbiddenSequence = getForbiddenSequence(data.name);
 		if (forbiddenSequence)

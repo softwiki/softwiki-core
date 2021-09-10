@@ -1,5 +1,5 @@
-import { NoteData, TagData, CategoryData } from "../../objects";
-import Api, {NoteApiData, CategoryApiData, TagApiData} from "../Api";
+import { NoteProperties, TagProperties, CategoryProperties } from "../../objects";
+import Api, {NoteModel, CategoryModel, TagModel} from "../Api";
 import VirtualFileSystem from "./VirtualFileSystem";
 import CategoriesApiHandler from "./CategoriesApiHandler";
 import NotesApiHandler from "./NotesApiHandler";
@@ -10,7 +10,7 @@ export interface FileSystemApiCache
 	notes: {[index: string]: {
 		meta: any
 	}}
-	tagsDataByName: {[name: string]: TagApiData}
+	tagsDataByName: {[name: string]: TagModel}
 	notesIdByTagId: {[tagId: string]: string[]}
 }
 
@@ -47,12 +47,12 @@ export default class FileSystemApiProvider extends Api
 		this._vfsInit = true;
 	}
 	
-	public async createNote(data: NoteData): Promise<NoteApiData>
+	public async createNote(data: NoteProperties): Promise<NoteModel>
 	{
 		return this._notesApiHandler.createNote(data);
 	}
 	
-	public async getNotes(): Promise<NoteApiData[]>
+	public async getNotes(): Promise<NoteModel[]>
 	{
 		await this._initVirtualFileSystem();
 		await this.getTags();
@@ -64,7 +64,7 @@ export default class FileSystemApiProvider extends Api
 		await this._notesApiHandler.deleteNote(id);
 	}
 	
-	public async updateNote(id: string, data: NoteData): Promise<void>
+	public async updateNote(id: string, data: NoteProperties): Promise<void>
 	{
 		await this._notesApiHandler.updateNote(id, data);
 	}
@@ -79,12 +79,12 @@ export default class FileSystemApiProvider extends Api
 		await this._notesApiHandler.addTagToNote(noteId, tagId);
 	}
 	
-	public async createTag(data: TagData): Promise<TagApiData>
+	public async createTag(data: TagProperties): Promise<TagModel>
 	{
 		return this._tagsApiHandler.createTag(data);
 	}
 
-	public async getTags(): Promise<TagApiData[]>
+	public async getTags(): Promise<TagModel[]>
 	{
 		return this._tagsApiHandler.getTags();
 	}
@@ -94,17 +94,17 @@ export default class FileSystemApiProvider extends Api
 		await this._tagsApiHandler.deleteTag(id);
 	}
 
-	public async updateTag(id: string, data: TagData): Promise<void>
+	public async updateTag(id: string, data: TagProperties): Promise<void>
 	{
 		await this._tagsApiHandler.updateTag(id, data);
 	}
 
-	public async createCategory(data: CategoryData): Promise<CategoryApiData>
+	public async createCategory(data: CategoryProperties): Promise<CategoryModel>
 	{
 		return this._categoriesApiHandler.createCategory(data);
 	}
 
-	public async getCategories(): Promise<CategoryApiData[]>
+	public async getCategories(): Promise<CategoryModel[]>
 	{
 		return this._categoriesApiHandler.getCategories();
 	}
@@ -114,7 +114,7 @@ export default class FileSystemApiProvider extends Api
 		await this._categoriesApiHandler.deleteCategory(id);
 	}
 
-	public async updateCategory(id: string, data: CategoryData): Promise<void>
+	public async updateCategory(id: string, data: CategoryProperties): Promise<void>
 	{
 		await this._categoriesApiHandler.updateCategory(id, data);
 	}

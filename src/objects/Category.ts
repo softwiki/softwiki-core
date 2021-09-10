@@ -1,18 +1,18 @@
 import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
-import { CategoryApiData } from "../api-providers/Api";
+import { CategoryModel } from "../api-providers/Api";
 import { Note } from "./Note";
 import { Base } from "./Base";
 
-export interface CategoryData
+export interface CategoryProperties
 {
 	name: string
 }
 
 export class Category extends Base
 {
-	private _data: CategoryData
+	private _data: CategoryProperties
 
-	constructor(data: CategoryApiData, client: SoftWikiClient)
+	constructor(data: CategoryModel, client: SoftWikiClient)
 	{
 		super(data.id, client);
 		this._data = data;
@@ -50,7 +50,7 @@ export class Category extends Base
 		this._client.run(DataEvent.CategoriesUpdated, {category: this});
 	}
 	
-	public getDataCopy(): CategoryData
+	public getDataCopy(): CategoryProperties
 	{
 		return JSON.parse(JSON.stringify(this._data));
 	}

@@ -1,4 +1,4 @@
-import Api, { NoteApiData, CategoryApiData, TagApiData } from "../api-providers/Api";
+import Api, { NoteModel, CategoryModel, TagModel } from "../api-providers/Api";
 import { SoftWikiClient } from "..";
 import { Note } from "./Note";
 import { Category, Tag } from ".";
@@ -21,21 +21,21 @@ export class Base
 		return this._id; 
 	}
 
-	protected _cacheAndReturnNote(data: NoteApiData): Note
+	protected _cacheAndReturnNote(data: NoteModel): Note
 	{
 		const note = new Note(data, this._client);
 		this._client.cache.notes[note.getId()] = note;
 		return note;
 	}
 
-	protected _cacheAndReturnTag(data: TagApiData): Tag
+	protected _cacheAndReturnTag(data: TagModel): Tag
 	{
 		const tag = new Tag(data, this._client);
 		this._client.cache.tags[tag.getId()] = tag;
 		return tag;
 	}
 
-	protected _cacheAndReturnCategory(data: CategoryApiData): Category
+	protected _cacheAndReturnCategory(data: CategoryModel): Category
 	{
 		const category = new Category(data, this._client);
 		this._client.cache.categories[category.getId()] = category;
