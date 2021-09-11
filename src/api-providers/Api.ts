@@ -29,7 +29,7 @@ export default abstract class Api
 	public abstract createCategory(data: CategoryProperties): Promise<CategoryModel>
 	public abstract getCategories(): Promise<CategoryModel[]>
 	public abstract deleteCategory(id: string): Promise<void>
-	public abstract updateCategory(id: string, data: CategoryProperties): Promise<void>
+	public abstract updateCategory(id: string, data: Partial<CategoryProperties>): Promise<void>
 
 	public client: SoftWikiClient = {} as SoftWikiClient
 }
