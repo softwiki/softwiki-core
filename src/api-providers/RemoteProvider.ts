@@ -99,7 +99,7 @@ export default class RemoveProvider extends Api
 		await this._fetch(`/notes/${noteId}/tags`, {
 			method: "POST",
 			body: JSON.stringify({tagId})
-		})
+		});
 	}
 
 	public async removeTagFromNote(noteId: string, tagId: string): Promise<void>
@@ -107,7 +107,7 @@ export default class RemoveProvider extends Api
 		await this._fetch(`/notes/${noteId}/tags`, {
 			method: "DELETE",
 			body: JSON.stringify({tagId})
-		})
+		});
 	}
 
 	public async createCategory(properties: CategoryProperties): Promise<CategoryModel>

@@ -4,6 +4,7 @@ import { TagProperties, NoteProperties } from "../objects";
 import Api, { NoteModel, CategoryModel, TagModel } from "./Api";
 import { CategoryProperties } from "../objects/Category";
 import sqlite, { RunResult } from "sqlite3";
+import { UnknownIdError } from "../errors/ApiError";
 
 const TABLE_NOTES = "notes";
 const TABLE_TAGS = "tags";
@@ -106,10 +107,10 @@ export default class SQLiteProvider extends Api
 	public async getNotes(): Promise<NoteModel[]>
 	{
 		const notes = await this._all(`SELECT CAST(n.id AS VARCHAR) id, n.title, n.content, n.categoryId, group_concat(tagId) AS tagsId
-		FROM ${TABLE_NOTES} AS n
-		LEFT JOIN ${TABLE_LINK_NOTES_TAGS} AS l
-		ON n.id = l.noteId
-		GROUP BY n.id`) as NoteModel[];
+			FROM ${TABLE_NOTES} AS n
+			LEFT JOIN ${TABLE_LINK_NOTES_TAGS} AS l
+			ON n.id = l.noteId
+			GROUP BY n.id`) as NoteModel[];
 
 		for (const note of notes)
 		{
@@ -127,12 +128,16 @@ export default class SQLiteProvider extends Api
 		const entries = Object.entries(propertiesForSQL).map(([key, value]) => `${key} = '${value}'`).join(",");
 
 		const sqlQuery = `UPDATE ${TABLE_NOTES} SET ${entries} WHERE id = ${id}`;
-		await this._run(sqlQuery);
+		const runResult = await this._run(sqlQuery);
+		if (runResult.changes === 0)
+			throw new UnknownIdError(`Unknown note id '${id}'`);
 	}
 
 	public async deleteNote(id: string): Promise<void>
 	{
-		await this._run(`DELETE FROM ${TABLE_NOTES} WHERE id = ${id}`);
+		const runResult = await this._run(`DELETE FROM ${TABLE_NOTES} WHERE id = ${id}`);
+		if (runResult.changes === 0)
+			throw new UnknownIdError(`Unknown note id '${id}'`);
 	}
 
 	public async createTag(properties: TagProperties): Promise<TagModel>
@@ -154,12 +159,16 @@ export default class SQLiteProvider extends Api
 	public async updateTag(id: string, properties: Partial<TagModel>): Promise<void>
 	{
 		const entries = Object.entries(properties).map(([key, value]) => `${key} = '${value}'`).join(",");
-		await this._run(`UPDATE ${TABLE_TAGS} SET ${entries} WHERE id = ${id}`);
+		const runResult = await this._run(`UPDATE ${TABLE_TAGS} SET ${entries} WHERE id = ${id}`);
+		if (runResult.changes === 0)
+			throw new UnknownIdError(`Unknown tag id '${id}'`);
 	}
 
 	public async deleteTag(id: string): Promise<void>
 	{
-		await this._run(`DELETE FROM ${TABLE_TAGS} WHERE id = ${id}`);
+		const runResult = await this._run(`DELETE FROM ${TABLE_TAGS} WHERE id = ${id}`);
+		if (runResult.changes === 0)
+			throw new UnknownIdError(`Unknown tag id '${id}'`);
 		await this._run(`DELETE FROM ${TABLE_LINK_NOTES_TAGS} WHERE tagId=${id}`);
 	}
 
@@ -189,11 +198,15 @@ export default class SQLiteProvider extends Api
 	public async updateCategory(id: string, properties: Partial<CategoryProperties>): Promise<void>
 	{
 		const entries = Object.entries(properties).map(([key, value]) => `${key} = '${value}'`).join(",");
-		await this._run(`UPDATE ${TABLE_CATEGORIES} SET ${entries} WHERE id = ${id}`);
+		const runResult = await this._run(`UPDATE ${TABLE_CATEGORIES} SET ${entries} WHERE id = ${id}`);
+		if (runResult.changes === 0)
+			throw new UnknownIdError(`Unknown category id '${id}'`);
 	}
 
 	public async deleteCategory(id: string): Promise<void>
 	{
-		await this._run(`DELETE FROM ${TABLE_CATEGORIES} WHERE id = ${id}`);
+		const runResult = await this._run(`DELETE FROM ${TABLE_CATEGORIES} WHERE id = ${id}`);
+		if (runResult.changes === 0)
+			throw new UnknownIdError(`Unknown category id '${id}'`);
 	}
 }

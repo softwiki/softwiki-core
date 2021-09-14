@@ -1,9 +1,8 @@
-import { Note, Tag } from "../objects";
-import { SoftWikiClient } from "../SoftWikiClient";
 import { Api } from "../api-providers";
 import SQLiteProvider from "../api-providers/SQLiteProvider";
 import fs from "fs/promises";
-import { CategoryModel, NoteModel, TagModel } from "api-providers/Api";
+import { CategoryModel, NoteModel, TagModel } from "../api-providers/Api";
+import {UnknownIdError} from "../errors/ApiError";
 
 const FIRST_NOTE = 0;
 const SECOND_NOTE = 1;
@@ -11,20 +10,21 @@ const THIRD_NOTE = 2;
 
 describe("SQLite provider", () => 
 {
-	let provider: Api;
-
-	beforeAll(async () =>
+	describe("Simple scenario", () => 
 	{
-		await fs.rm("./tests.sqlite3", {force: true});
-		provider = await SQLiteProvider.create("./tests.sqlite3");
-	});
-
-	describe("Simple scenario", () => {
 		let notes: NoteModel[];
-		let notesCache: NoteModel[] = []
+		const notesCache: NoteModel[] = [];
 
-		describe("Notes", () => {
+		let provider: Api;
 
+		beforeAll(async () =>
+		{
+			await fs.rm("./tests.sqlite3", {force: true});
+			provider = await SQLiteProvider.create("./tests.sqlite3");
+		});
+
+		describe("Notes", () => 
+		{
 			test("Notes list is empty", async () => 
 			{
 				notes = await provider.getNotes();
@@ -37,6 +37,12 @@ describe("SQLite provider", () =>
 				notesCache.push(note);
 				const notes = await provider.getNotes();
 				expect(notes).toHaveLength(1);
+
+				expect(notes[FIRST_NOTE]).toHaveProperty("title");
+				expect(notes[FIRST_NOTE]).toHaveProperty("content");
+				expect(notes[FIRST_NOTE]).toHaveProperty("tagsId");
+				expect(notes[FIRST_NOTE]).toHaveProperty("categoryId");
+
 				expect(notes[FIRST_NOTE].title).toEqual(notesCache[FIRST_NOTE].title);
 			});
 
@@ -140,6 +146,9 @@ describe("SQLite provider", () =>
 				tag1 = await provider.createTag({name: "Tag 1", color: {r: 1, g: 1, b: 1}});
 				const tags = await provider.getTags();
 				expect(tags).toHaveLength(1);
+
+				expect(tags[FIRST_NOTE]).toHaveProperty("name");
+				expect(tags[FIRST_NOTE]).toHaveProperty("color");
 			});
 
 			test("Adding second tag", async () => 
@@ -176,22 +185,25 @@ describe("SQLite provider", () =>
 
 		describe("Add/Remove tags to/from notes", () =>
 		{
-			let notesCache: NoteModel[] = []
-			let tagsCache: TagModel[] = []
+			let notesCache: NoteModel[] = [];
+			let tagsCache: TagModel[] = [];
 
-			it("creates 2 notes", async () => {
-				await provider.createNote({title: "Note 1", content: "content", tagsId: [], categoryId: undefined})
-				await provider.createNote({title: "Note 2", content: "content", tagsId: [], categoryId: undefined})
+			it("creates 2 notes", async () => 
+			{
+				await provider.createNote({title: "Note 1", content: "content", tagsId: [], categoryId: undefined});
+				await provider.createNote({title: "Note 2", content: "content", tagsId: [], categoryId: undefined});
 				notesCache = await provider.getNotes();
-			})
+			});
 
-			it("creates 2 tags", async () => {
-				await provider.createTag({name: "Tag 1", color: {r: 1, g: 1, b: 1}})
-				await provider.createTag({name: "Tag 2", color: {r: 1, g: 1, b: 1}})
+			it("creates 2 tags", async () => 
+			{
+				await provider.createTag({name: "Tag 1", color: {r: 1, g: 1, b: 1}});
+				await provider.createTag({name: "Tag 2", color: {r: 1, g: 1, b: 1}});
 				tagsCache = await provider.getTags();
-			})
+			});
 
-			it("adds Tag 1 to Note 2", async () => {
+			it("adds Tag 1 to Note 2", async () => 
+			{
 				await provider.addTagToNote(notesCache[1].id, tagsCache[0].id);
 				const notes = await provider.getNotes();
 
@@ -199,9 +211,10 @@ describe("SQLite provider", () =>
 
 				expect(notes[1].tagsId).toHaveLength(1);
 				expect(notes[1].tagsId[0]).toStrictEqual(tagsCache[0].id);
-			})
+			});
 
-			it("adds Tag 2 to Note 2", async () => {
+			it("adds Tag 2 to Note 2", async () => 
+			{
 				await provider.addTagToNote(notesCache[1].id, tagsCache[1].id);
 				const notes = await provider.getNotes();
 
@@ -210,24 +223,27 @@ describe("SQLite provider", () =>
 				expect(notes[1].tagsId).toHaveLength(2);
 				expect(notes[1].tagsId[0]).toStrictEqual(tagsCache[0].id);
 				expect(notes[1].tagsId[1]).toStrictEqual(tagsCache[1].id);
-			})
+			});
 
-			it("fails silently adding Tag 2 to Note 2 again", async () => {
+			it("fails silently adding Tag 2 to Note 2 again", async () => 
+			{
 				await provider.addTagToNote(notesCache[1].id, tagsCache[1].id);
 				const notes = await provider.getNotes();
 				expect(notes[1].tagsId).toHaveLength(2);
 				expect(notes[1].tagsId[0]).toStrictEqual(tagsCache[0].id);
 				expect(notes[1].tagsId[1]).toStrictEqual(tagsCache[1].id);
-			})
+			});
 			
-			it("removes Tag 1 from Note 2", async () => {
+			it("removes Tag 1 from Note 2", async () => 
+			{
 				await provider.removeTagFromNote(notesCache[1].id, tagsCache[0].id);
 				const notes = await provider.getNotes();
 				expect(notes[1].tagsId).toHaveLength(1);
 				expect(notes[1].tagsId[0]).toStrictEqual(tagsCache[1].id);
-			})
+			});
 			
-			it("deletes Tag 2, should remove it from notes automatically", async () => {
+			it("deletes Tag 2, should remove it from notes automatically", async () => 
+			{
 				await provider.deleteTag(tagsCache[1].id);
 
 				const tags = await provider.getTags();
@@ -236,15 +252,16 @@ describe("SQLite provider", () =>
 
 				const notes = await provider.getNotes();
 				expect(notes[1].tagsId).toHaveLength(0);
-			})
+			});
 			
-			it("delete last tag", async () => {
-				await provider.deleteTag(tagsCache[0].id)
+			it("delete last tag", async () => 
+			{
+				await provider.deleteTag(tagsCache[0].id);
 
 				const tags = await provider.getTags();
 				expect(tags).toHaveLength(0);
-			})
-		})
+			});
+		});
 
 		describe("Categories", () => 
 		{
@@ -262,6 +279,8 @@ describe("SQLite provider", () =>
 				category1 = await provider.createCategory({name: "Category 1"});
 				const categories = await provider.getCategories();
 				expect(categories).toHaveLength(1);
+
+				expect(categories[FIRST_NOTE]).toHaveProperty("name");
 			});
 
 			test("Adding second category", async () => 
@@ -295,5 +314,55 @@ describe("SQLite provider", () =>
 				expect(categories).toHaveLength(0);
 			});
 		});
-	})
+	});
+	
+	describe("Wrong uses", () => 
+	{
+		let provider: Api;
+
+		beforeAll(async () =>
+		{
+			await fs.rm("./tests.sqlite3", {force: true});
+			provider = await SQLiteProvider.create("./tests.sqlite3");
+
+			await provider.createNote({title: "Note 1", content: "test", tagsId: [], categoryId: undefined});
+			await provider.createNote({title: "Note 2", content: "test", tagsId: [], categoryId: undefined});
+
+			await provider.createTag({name: "Tag 1", color: {r: 1, g: 1, b: 1}});
+			await provider.createTag({name: "Tag 2", color: {r: 1, g: 1, b: 1}});
+
+			await provider.createCategory({name: "Category 1"});
+			await provider.createCategory({name: "Category 2"});
+		});
+
+		it("throws error when trying to update a note with an unknown id", async () => 
+		{
+			expect(provider.updateNote("7355608", {title: "Note unknown"})).rejects.toThrow(UnknownIdError);
+		});
+
+		it("throws error when trying to delete a note with an unknown id", async () => 
+		{
+			expect(provider.deleteNote("7355608")).rejects.toThrow(UnknownIdError);
+		});
+
+		it("throws error when trying to update a tag with an unknown id", async () => 
+		{
+			expect(provider.updateTag("7355608", {name: "Tag unknown"})).rejects.toThrow(UnknownIdError);
+		});
+
+		it("throws error when trying to delete a tag with an unknown id", async () => 
+		{
+			expect(provider.deleteTag("7355608")).rejects.toThrow(UnknownIdError);
+		});
+
+		it("throws error when trying to update a category with an unknown id", async () => 
+		{
+			expect(provider.updateCategory("7355608", {name: "Tag unknown"})).rejects.toThrow(UnknownIdError);
+		});
+
+		it("throws error when trying to delete a category with an unknown id", async () => 
+		{
+			expect(provider.deleteCategory("7355608")).rejects.toThrow(UnknownIdError);
+		});
+	});
 });
