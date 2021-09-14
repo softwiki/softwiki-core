@@ -12,6 +12,13 @@ export interface NoteProperties
 	categoryId: string | undefined
 }
 
+export function isNoteModel(object: unknown): object is Note {
+	return "title" in (object as any)
+		&& "content" in (object as any)
+		&& "tagsId" in (object as any)
+		&& "categoryId" in (object as any);
+}
+
 export class Note extends Base {
 	private _data: NoteProperties
 

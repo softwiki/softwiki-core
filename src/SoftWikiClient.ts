@@ -1,9 +1,10 @@
-import { Note, NoteProperties } from "./objects";
+import { isCategorygModel, isNoteModel, isTagModel, Note, NoteProperties } from "./objects";
 import { Tag, TagProperties } from "./objects";
 import { Category, CategoryProperties } from "./objects";
 
 import Api, { NoteModel, CategoryModel, TagModel } from "./api-providers/Api";
 import { EventService } from "./services";
+import { WrongDataStructure } from "./errors/ApiError";
 
 export enum DataEvent
 {
@@ -56,6 +57,8 @@ export class SoftWikiClient {
 		this.cache.notes = {};
 		const notesData = await this._apiProvider.getNotes();
 		const notes = notesData.map((note: NoteModel) => {
+			if (!isNoteModel(note))
+				throw new WrongDataStructure("The api provider did not return a valid note model object");
 			return this._apiResponseToNote(note);
 		});
 		return notes;
@@ -72,6 +75,8 @@ export class SoftWikiClient {
 		this.cache.tags = {};
 		const tagsData = await this._apiProvider.getTags();
 		const tags = tagsData.map((tag: TagModel) => {
+			if (!isTagModel(tag))
+				throw new WrongDataStructure("The api provider did not return a valid tag model object");
 			return this._apiResponseToTag(tag);
 		});
 		return tags;
@@ -86,8 +91,10 @@ export class SoftWikiClient {
 
 	public async fetchCategories(): Promise<Category[]> {
 		const categoriesData = await this._apiProvider.getCategories();
-		const categories = categoriesData.map((projec: CategoryModel) => {
-			return this._apiResponseToCategory(projec);
+		const categories = categoriesData.map((category: CategoryModel) => {
+			if (!isCategorygModel(category))
+				throw new WrongDataStructure("The api provider did not return a valid note model object");
+			return this._apiResponseToCategory(category);
 		});
 		return categories;
 	}

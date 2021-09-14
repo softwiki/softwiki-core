@@ -3,6 +3,10 @@ import { SoftWikiClient } from "./SoftWikiClient";
 import { Api } from "./api-providers";
 import MockedDataProvider, {ICollections} from "./api-providers/MockedProvider";
 
+describe("deprecated", () => {
+	test("deprecated", () => {});
+});
+/*
 describe("Frequent cases", () => {
 	const mockedDataProvider: Api = new MockedDataProvider({notes: [], tags: [], categories: []});
 	const dataApi = new SoftWikiClient({provider: mockedDataProvider});
@@ -229,4 +233,4 @@ describe("Tags", () => {
 		expect(notes[1].getTags()).toHaveLength(0);
 		expect(notes[2].getTags()).toHaveLength(1);
 	});
-});
+});*/

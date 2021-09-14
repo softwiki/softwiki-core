@@ -8,6 +8,11 @@ export interface TagProperties
 	color: Color
 }
 
+export function isTagModel(object: unknown): object is Tag {
+	return "name" in (object as any)
+		&& "color" in (object as any);
+}
+
 export interface Color
 {
 	r: number

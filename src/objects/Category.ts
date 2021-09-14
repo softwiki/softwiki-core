@@ -8,6 +8,10 @@ export interface CategoryProperties
 	name: string
 }
 
+export function isCategorygModel(object: unknown): object is Category {
+	return "name" in (object as any);
+}
+
 export class Category extends Base {
 	private _data: CategoryProperties
 
