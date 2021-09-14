@@ -77,10 +77,9 @@ export default class RemoteProvider extends Api {
 	}
 
 	public async deleteTag(id: string): Promise<void> {
-		const res = await this._fetch(`/tags/${id}`, {
+		await this._fetch(`/tags/${id}`, {
 			method: "DELETE"
 		});
-		return res.json();
 	}
 
 	public async addTagToNote(noteId: string, tagId: string): Promise<void> {
