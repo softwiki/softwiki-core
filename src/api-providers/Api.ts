@@ -12,8 +12,7 @@ export interface NoteModel extends ModelBase, NoteProperties {}
 export interface TagModel extends ModelBase, TagProperties {}
 export interface CategoryModel extends ModelBase, CategoryProperties {}
 
-export default abstract class Api
-{
+export default abstract class Api {
 	public abstract createNote(data: NoteProperties): Promise<NoteModel>
 	public abstract getNotes(): Promise<NoteModel[]>
 	public abstract deleteNote(id: string): Promise<void>

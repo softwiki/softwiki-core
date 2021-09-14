@@ -14,8 +14,7 @@ export interface FileSystemApiCache
 	notesIdByTagId: {[tagId: string]: string[]}
 }
 
-export default class FileSystemApiProvider extends Api
-{
+export default class FileSystemApiProvider extends Api {
 	private _basePath: string
 	private _fs: any	
 	private _cache: FileSystemApiCache
@@ -25,8 +24,7 @@ export default class FileSystemApiProvider extends Api
 	private _tagsApiHandler: TagsApiHandler
 	private _categoriesApiHandler: CategoriesApiHandler
 
-	constructor(basePath: string, fs: unknown)
-	{
+	constructor(basePath: string, fs: unknown) {
 		super();
 		this._basePath = basePath;
 		this._fs = fs;
@@ -39,83 +37,68 @@ export default class FileSystemApiProvider extends Api
 	}
 
 	private _vfsInit = false;
-	private async _initVirtualFileSystem(): Promise<void>
-	{
+	private async _initVirtualFileSystem(): Promise<void> {
 		if (this._vfsInit)
 			return ;
 		await this._virtualFileSystem.init();
 		this._vfsInit = true;
 	}
 	
-	public async createNote(data: NoteProperties): Promise<NoteModel>
-	{
+	public async createNote(data: NoteProperties): Promise<NoteModel> {
 		return this._notesApiHandler.createNote(data);
 	}
 	
-	public async getNotes(): Promise<NoteModel[]>
-	{
+	public async getNotes(): Promise<NoteModel[]> {
 		await this._initVirtualFileSystem();
 		await this.getTags();
 		return this._notesApiHandler.getNotes();
 	}
 
-	public async deleteNote(id: string): Promise<void>
-	{
+	public async deleteNote(id: string): Promise<void> {
 		await this._notesApiHandler.deleteNote(id);
 	}
 	
-	public async updateNote(id: string, data: NoteProperties): Promise<void>
-	{
+	public async updateNote(id: string, data: NoteProperties): Promise<void> {
 		await this._notesApiHandler.updateNote(id, data);
 	}
 
-	public async removeTagFromNote(noteId: string, tagId: string): Promise<void>
-	{
+	public async removeTagFromNote(noteId: string, tagId: string): Promise<void> {
 		await this._notesApiHandler.removeTagFromNote(noteId, tagId);
 	}
 
-	public async addTagToNote(noteId: string, tagId: string): Promise<void>
-	{
+	public async addTagToNote(noteId: string, tagId: string): Promise<void> {
 		await this._notesApiHandler.addTagToNote(noteId, tagId);
 	}
 	
-	public async createTag(data: TagProperties): Promise<TagModel>
-	{
+	public async createTag(data: TagProperties): Promise<TagModel> {
 		return this._tagsApiHandler.createTag(data);
 	}
 
-	public async getTags(): Promise<TagModel[]>
-	{
+	public async getTags(): Promise<TagModel[]> {
 		return this._tagsApiHandler.getTags();
 	}
 
-	public async deleteTag(id: string): Promise<void>
-	{
+	public async deleteTag(id: string): Promise<void> {
 		await this._tagsApiHandler.deleteTag(id);
 	}
 
-	public async updateTag(id: string, data: TagProperties): Promise<void>
-	{
+	public async updateTag(id: string, data: TagProperties): Promise<void> {
 		await this._tagsApiHandler.updateTag(id, data);
 	}
 
-	public async createCategory(data: CategoryProperties): Promise<CategoryModel>
-	{
+	public async createCategory(data: CategoryProperties): Promise<CategoryModel> {
 		return this._categoriesApiHandler.createCategory(data);
 	}
 
-	public async getCategories(): Promise<CategoryModel[]>
-	{
+	public async getCategories(): Promise<CategoryModel[]> {
 		return this._categoriesApiHandler.getCategories();
 	}
 
-	public async deleteCategory(id: string): Promise<void>
-	{
+	public async deleteCategory(id: string): Promise<void> {
 		await this._categoriesApiHandler.deleteCategory(id);
 	}
 
-	public async updateCategory(id: string, data: CategoryProperties): Promise<void>
-	{
+	public async updateCategory(id: string, data: CategoryProperties): Promise<void> {
 		await this._categoriesApiHandler.updateCategory(id, data);
 	}
 }

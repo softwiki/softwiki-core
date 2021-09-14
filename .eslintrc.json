@@ -40,7 +40,7 @@
         "@typescript-eslint/type-annotation-spacing": "error",
         "@typescript-eslint/space-infix-ops": "error",
         "@typescript-eslint/no-empty-function": "off",
-        "brace-style": ["error", "allman", {"allowSingleLine": true}],
+        "brace-style": ["error", "stroustrup", {"allowSingleLine": true}],
         "lines-between-class-members": ["error", "always", {"exceptAfterSingleLine": true}],
         "padded-blocks": ["error", "never"],
         "no-multiple-empty-lines": ["error", {"max": 1}],

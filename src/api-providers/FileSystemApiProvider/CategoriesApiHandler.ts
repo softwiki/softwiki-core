@@ -6,15 +6,12 @@ import VirtualFileSystem from "./VirtualFileSystem";
 import FileSystemApiProvider, { FileSystemApiCache } from "./FileSystemApiProvider";
 import { getForbiddenSequence } from "./helper";
 
-export default class CategoriesApiHandler extends ApiHandlerBase
-{
-	constructor(virtualFileSystem: VirtualFileSystem, cache: FileSystemApiCache, parent: FileSystemApiProvider)
-	{
+export default class CategoriesApiHandler extends ApiHandlerBase {
+	constructor(virtualFileSystem: VirtualFileSystem, cache: FileSystemApiCache, parent: FileSystemApiProvider) {
 		super(virtualFileSystem, cache, parent);
 	}
 	
-	public async createCategory(data: CategoryProperties): Promise<CategoryModel>
-	{
+	public async createCategory(data: CategoryProperties): Promise<CategoryModel> {
 		const forbiddenSequence = getForbiddenSequence(data.name);
 		if (forbiddenSequence)
 			throw new SoftWikiError(`The character sequence "${forbiddenSequence}" is not allowed in category name`);
@@ -22,12 +19,10 @@ export default class CategoriesApiHandler extends ApiHandlerBase
 		return {...data, id: directory.id};
 	}
 
-	public async getCategories(): Promise<CategoryModel[]>
-	{
+	public async getCategories(): Promise<CategoryModel[]> {
 		const categories = [];
 
-		for (const [directoryId, directory] of Object.entries(this._virtualFileSystem.notes.directories))
-		{
+		for (const [directoryId, directory] of Object.entries(this._virtualFileSystem.notes.directories)) {
 			if (directory.name === ".")
 				continue ;
 
@@ -40,16 +35,14 @@ export default class CategoriesApiHandler extends ApiHandlerBase
 		return categories;
 	}
 
-	public async deleteCategory(id: string): Promise<void>
-	{
+	public async deleteCategory(id: string): Promise<void> {
 		const directory = this._virtualFileSystem.notes.getDirectoryById(id);
 		if (!directory)
 			throw new SoftWikiError("Directory with id " + id + " doesn't exist");
 		await directory.delete();
 	}
 
-	public async updateCategory(id: string, data: CategoryProperties): Promise<void>
-	{
+	public async updateCategory(id: string, data: CategoryProperties): Promise<void> {
 		const forbiddenSequence = getForbiddenSequence(data.name);
 		if (forbiddenSequence)
 			throw new SoftWikiError(`The character sequence "${forbiddenSequence}" is not allowed in category name`);
@@ -59,14 +52,12 @@ export default class CategoriesApiHandler extends ApiHandlerBase
 			throw new Error("Directory with id " + id + " doesn't exist");
 
 		const category = this._clientCache.categories[id];
-		if (!category)
-		{
+		if (!category) {
 			throw new Error("Category with id " + id + " doesn't exist in cache");
 		}
 
 		const oldData = category.getDataCopy();
-		if (oldData.name !== data.name)
-		{
+		if (oldData.name !== data.name) {
 			await directory.rename(data.name);
 		}
 	}

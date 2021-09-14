@@ -1,21 +1,17 @@
-export default class QueueService
-{
+export default class QueueService {
 	queue:  (() => Promise<void>)[]
 
-	constructor()
-	{
+	constructor() {
 		this.queue = [];
 	}
 
-	public add(f: () => Promise<void>): void
-	{
+	public add(f: () => Promise<void>): void {
 		this.queue.push(f);
 		if (this.queue.length === 1)
 			this.next();
 	}
 
-	public async next(): Promise<void>
-	{
+	public async next(): Promise<void> {
 		if (this.queue.length === 0)
 			return ;
 		const f = this.queue[0];

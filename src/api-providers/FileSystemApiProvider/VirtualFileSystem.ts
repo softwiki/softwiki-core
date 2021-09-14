@@ -1,8 +1,7 @@
 import { SoftWikiError } from "../../errors";
 
 let nextId = 0;
-function generateId(): string
-{
+function generateId(): string {
 	return (nextId++).toString();
 }
 
@@ -13,15 +12,13 @@ interface FileSystemNodeArguments
 	root: VirtualFileSystem | null
 }
 
-class FileSystemNode<T>
-{
+class FileSystemNode<T> {
 	private _name: string
 	private _basePath: string
 	private _id: string
 	private _root: VirtualFileSystem
 
-	constructor({basePath, name, root}: FileSystemNodeArguments)
-	{
+	constructor({basePath, name, root}: FileSystemNodeArguments) {
 		this._name = name;
 		this._basePath = basePath;
 		this._id = generateId();
@@ -34,15 +31,13 @@ class FileSystemNode<T>
 	get id(): string { return this._id; }
 	get root(): VirtualFileSystem { return this._root;}
 
-	async rename(name: string): Promise<T>
-	{
+	async rename(name: string): Promise<T> {
 		await this.root.fs.rename(`${this.basePath}/${this.name}`, `${this.basePath}/${name}`);
 		this._name = name;
 		return this as unknown as T;
 	}
 
-	async moveTo(destinationDirectoryId: string): Promise<T>
-	{
+	async moveTo(destinationDirectoryId: string): Promise<T> {
 		const destinationDirectory = this.root.getDirectoryById(destinationDirectoryId);
 		if (!destinationDirectory)
 			throw new SoftWikiError("Directory with id " + destinationDirectoryId + " doesn't exist");
@@ -51,106 +46,91 @@ class FileSystemNode<T>
 		return this as unknown as T;
 	}
 
-	private _getParent(directory: FileSystemDirectory): FileSystemDirectory | undefined
-	{
+	private _getParent(directory: FileSystemDirectory): FileSystemDirectory | undefined {
 		if (directory.files[this.id])
 			return directory;
 		if (directory.directories[this.id])
 			return directory;
 
-		for (const [, nextDirectory] of Object.entries(directory.directories))
-		{
+		for (const [, nextDirectory] of Object.entries(directory.directories)) {
 			const parentDirectory = this._getParent(nextDirectory);
 			if (parentDirectory)
 				return parentDirectory;
 		}
 	}
 
-	public getParent(): FileSystemDirectory | undefined
-	{
+	public getParent(): FileSystemDirectory | undefined {
 		return this._getParent(this.root);
 	}
 }
 
-export class FileSystemDirectory extends FileSystemNode<FileSystemDirectory>
-{
+export class FileSystemDirectory extends FileSystemNode<FileSystemDirectory> {
 	private _directories: { [index: string]: FileSystemDirectory }
 	private _files: { [index: string]: FileSystemFile }
 
 	get directories(): { [index: string]: FileSystemDirectory } { return this._directories; }
 	get files(): { [index: string]: FileSystemFile } { return this._files; }
 
-	constructor({basePath, name, root}: FileSystemNodeArguments)
-	{
+	constructor({basePath, name, root}: FileSystemNodeArguments) {
 		super({basePath, name, root});
 		this._directories = {};
 		this._files = {};
 	}
 	
-	public async createDirectory(name: string): Promise<FileSystemDirectory>
-	{
+	public async createDirectory(name: string): Promise<FileSystemDirectory> {
 		const directory = this.addDirectory(name);
 		await this.root.fs.mkdir(directory.path);
 		return directory;
 	}
 
-	public addDirectory(name: string): FileSystemDirectory
-	{
+	public addDirectory(name: string): FileSystemDirectory {
 		const directory = new FileSystemDirectory({basePath: this.path, name: name, root: this.root});
 		this._directories[directory.id] = directory;
 		return this._directories[directory.id];
 	}
 
-	public addFile(name: string): FileSystemFile
-	{
+	public addFile(name: string): FileSystemFile {
 		const file = new FileSystemFile({basePath: this.path, name: name, root: this.root});
 		this._files[file.id] = file;
 		return this._files[file.id];
 	}
 
-	public getDirectoryById(id: string): FileSystemDirectory | undefined
-	{
+	public getDirectoryById(id: string): FileSystemDirectory | undefined {
 		if (id == this.id)
 			return this;
 		if (this._directories[id])
 			return this._directories[id];
 
-		for (const [, directory] of Object.entries(this._directories))
-		{
+		for (const [, directory] of Object.entries(this._directories)) {
 			const result = directory.getDirectoryById(id);
 			if (result)
 				return result;
 		}
 	}
 
-	public getParentById(id: string): FileSystemDirectory | undefined
-	{
+	public getParentById(id: string): FileSystemDirectory | undefined {
 		if (this._directories[id])
 			return this;
 
-		for (const [, directory] of Object.entries(this._directories))
-		{
+		for (const [, directory] of Object.entries(this._directories)) {
 			const result = directory.getParentById(id);
 			if (result)
 				return result;
 		}
 	}
 
-	public getFileById(id: string): FileSystemFile | undefined
-	{
+	public getFileById(id: string): FileSystemFile | undefined {
 		if (this._files[id])
 			return this._files[id];
 
-		for (const [, directory] of Object.entries(this._directories))
-		{
+		for (const [, directory] of Object.entries(this._directories)) {
 			const file = directory.getFileById(id);
 			if (file)
 				return file;
 		}
 	}
 
-	async delete(): Promise<void>
-	{
+	async delete(): Promise<void> {
 		const parentDirectory = this.getParent();
 		if (parentDirectory === undefined)
 			throw Error("Couldn't find parent directory of id " + this.id);
@@ -161,25 +141,20 @@ export class FileSystemDirectory extends FileSystemNode<FileSystemDirectory>
 	}
 }
 
-export class FileSystemFile extends FileSystemNode<FileSystemFile>
-{
-	constructor({basePath, name, root}: FileSystemNodeArguments)
-	{
+export class FileSystemFile extends FileSystemNode<FileSystemFile> {
+	constructor({basePath, name, root}: FileSystemNodeArguments) {
 		super({basePath, name, root});
 	}
 	
-	async write(content: string): Promise<void>
-	{
+	async write(content: string): Promise<void> {
 		await this.root.fs.writeFile(this.path, content);
 	}
 	
-	async read(): Promise<string>
-	{
+	async read(): Promise<string> {
 		return await this.root.fs.readFile(this.path, "utf8");
 	}
 
-	async delete(): Promise<void>
-	{
+	async delete(): Promise<void> {
 		const parentDirectory = this.getParent();
 		if (parentDirectory === undefined)
 			throw Error("Couldn't find parent directory of id " + this.id);
@@ -190,15 +165,13 @@ export class FileSystemFile extends FileSystemNode<FileSystemFile>
 	}
 }
 
-export default class VirtualFileSystem extends FileSystemDirectory
-{
+export default class VirtualFileSystem extends FileSystemDirectory {
 	public fs: any
 	private _notesDirectory: FileSystemDirectory = {} as FileSystemDirectory
 	private _configDirectory: FileSystemDirectory = {} as FileSystemDirectory
 	private _tagsFile: FileSystemFile = {} as FileSystemFile
 
-	constructor(basePath: string, fs: unknown)
-	{
+	constructor(basePath: string, fs: unknown) {
 		super({basePath, name: ".", root: null});
 		this.fs = fs;
 	}
@@ -206,20 +179,17 @@ export default class VirtualFileSystem extends FileSystemDirectory
 	public get notes(): FileSystemDirectory { return this._notesDirectory; }
 	public get tags(): FileSystemFile { return this._tagsFile; }
 
-	async init(): Promise<void>
-	{
+	async init(): Promise<void> {
 		this._notesDirectory = this.addDirectory("notes");
 
 		const directoriesName = await this._getDirectories(this._notesDirectory.path);
 		directoriesName.push(".");
 
-		for (const directoryName of directoriesName)
-		{
+		for (const directoryName of directoriesName) {
 			const directory = this._notesDirectory.addDirectory(directoryName);
 			const filesNames = await this._getFiles(directory.path);
 
-			for (const fileName of filesNames)
-			{
+			for (const fileName of filesNames) {
 				directory.addFile(fileName);
 			}
 		}
@@ -228,15 +198,13 @@ export default class VirtualFileSystem extends FileSystemDirectory
 		this._tagsFile = this._configDirectory.addFile("tags.json");
 	}
 
-	private async _getDirectories(path: string): Promise<string[]>
-	{
+	private async _getDirectories(path: string): Promise<string[]> {
 		const results = await this.fs.readdir(path, {withFileTypes: true});
 		const directories = results.filter((result: any) => result.isDirectory()).map((result: any) => result.name);
 		return directories;
 	}
 
-	private async _getFiles(path: string): Promise<string[]>
-	{
+	private async _getFiles(path: string): Promise<string[]> {
 		const results = await this.fs.readdir(path, {withFileTypes: true});
 		const files = results.filter((result: any) => result.isFile()).map((result: any) => result.name);
 		return files;

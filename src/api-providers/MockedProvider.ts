@@ -11,28 +11,24 @@ export interface ICollections
 	categories: CategoryModel[]
 }
 
-export default class FakeDataProvider extends Api
-{
+export default class FakeDataProvider extends Api {
 	collections: ICollections = {notes: [], tags: [], categories: []}
 
 	nextId = 0;
 
-	constructor(fakeCollections: ICollections)
-	{
+	constructor(fakeCollections: ICollections) {
 		super();
 		this.collections = fakeCollections;
 	}
 
 	public async setup(): Promise<void> {}
 
-	public async createNote(properties: NoteProperties): Promise<NoteModel>
-	{
+	public async createNote(properties: NoteProperties): Promise<NoteModel> {
 		this.nextId++;
 		return {...properties, id: this.nextId.toString()};
 	}
 
-	public async getNotes(): Promise<NoteModel[]>
-	{
+	public async getNotes(): Promise<NoteModel[]> {
 		return this.collections.notes;
 	}
 
@@ -41,28 +37,24 @@ export default class FakeDataProvider extends Api
 	public async removeTagFromNote(noteId: string, tagId: string): Promise<void> {}
 	public async addTagToNote(id: string, tagId: string): Promise<void> {}
 
-	public async createTag(document: TagProperties): Promise<TagModel>
-	{
+	public async createTag(document: TagProperties): Promise<TagModel> {
 		this.nextId++;
 		return {...document, id: this.nextId.toString()};
 	}
 
-	public async getTags(): Promise<TagModel[]>
-	{
+	public async getTags(): Promise<TagModel[]> {
 		return this.collections.tags;
 	}
 
 	public async deleteTag(id: string): Promise<void> {}
 	public async updateTag(id: string, data: TagModel): Promise<void> {}
 
-	public async createCategory(document: CategoryProperties): Promise<CategoryModel>
-	{
+	public async createCategory(document: CategoryProperties): Promise<CategoryModel> {
 		this.nextId++;
 		return {...document, id: this.nextId.toString()};
 	}
 
-	public async getCategories(): Promise<CategoryModel[]>
-	{
+	public async getCategories(): Promise<CategoryModel[]> {
 		return this.collections.categories;
 	}
 

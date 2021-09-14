@@ -14,19 +14,16 @@ const COLLECTION_NOTES = "notes";
 const COLLECTION_TAGS = "tags";
 const COLLECTION_PROJECTS = "categories";
 
-function clone(x: any): any
-{
+function clone(x: any): any {
 	return JSON.parse(JSON.stringify(x));
 }
 
-export default class JsonApiProvider extends Api
-{
+export default class JsonApiProvider extends Api {
 	private _collections: ICollections
 	private _writeDatabase: (content: string) => Promise<void>
 	private _readDatabase: () => Promise<string>
 
-	constructor(writeDatabase: (content: string) => Promise<void>, readDatabase: () => Promise<string>)
-	{
+	constructor(writeDatabase: (content: string) => Promise<void>, readDatabase: () => Promise<string>) {
 		super();
 
 		this._collections = {
@@ -39,21 +36,17 @@ export default class JsonApiProvider extends Api
 		this._readDatabase = readDatabase;
 	}
 
-	public async setup(): Promise<void>
-	{
-		try
-		{
+	public async setup(): Promise<void> {
+		try {
 			const data = await this._readDatabase();
 			this._collections = JSON.parse(data);
 		}
-		catch (e)
-		{
+		catch (e) {
 			// Todo
 		}
 	}
 
-	public async createNote(properties: NoteProperties): Promise<NoteModel>
-	{
+	public async createNote(properties: NoteProperties): Promise<NoteModel> {
 		const documentDB = this._createDocument(properties);
 		const collection = this._getCollection(COLLECTION_NOTES);
 
@@ -63,43 +56,36 @@ export default class JsonApiProvider extends Api
 	}
 	
 	private _didSetup = false;
-	public async getNotes(): Promise<NoteModel[]>
-	{
-		if (!this._didSetup)
-		{
+	public async getNotes(): Promise<NoteModel[]> {
+		if (!this._didSetup) {
 			await this.setup();
 			this._didSetup = true;
 		}
 		return clone(this._getCollection(COLLECTION_NOTES));
 	}
 
-	public async deleteNote(id: string): Promise<void>
-	{
+	public async deleteNote(id: string): Promise<void> {
 		const collection = this._getCollection<NoteModel>(COLLECTION_NOTES);
 		const index = this._getIndexInCollectionByID(COLLECTION_NOTES, id);
 
-		if (index !== -1)
-		{
+		if (index !== -1) {
 			collection.splice(index, 1);
 			await this._saveDatabase();
 			return ;
 		}
 	}
 
-	public async updateNote(id: string, data: NoteProperties): Promise<void>
-	{
+	public async updateNote(id: string, data: NoteProperties): Promise<void> {
 		const collection = this._getCollection<NoteModel>(COLLECTION_NOTES);
 		const index = this._getIndexInCollectionByID(COLLECTION_NOTES, id);
 		
-		if (index !== -1)
-		{
+		if (index !== -1) {
 			collection[index] = {...clone(data), id};
 			await this._saveDatabase();
 		}
 	}
 	
-	public async removeTagFromNote(noteId: string, tagId: string): Promise<void>
-	{
+	public async removeTagFromNote(noteId: string, tagId: string): Promise<void> {
 		const collection = this._getCollection<NoteModel>(COLLECTION_NOTES);
 		const index = this._getIndexInCollectionByID(COLLECTION_NOTES, noteId);
 		const tagIndex = collection[index].tagsId.indexOf(tagId);
@@ -108,8 +94,7 @@ export default class JsonApiProvider extends Api
 		await this._saveDatabase();
 	}
 
-	public async addTagToNote(noteId: string, tagId: string): Promise<void>
-	{
+	public async addTagToNote(noteId: string, tagId: string): Promise<void> {
 		const collection = this._getCollection<NoteModel>(COLLECTION_NOTES);
 		const index = this._getIndexInCollectionByID(COLLECTION_NOTES, noteId);
 
@@ -117,8 +102,7 @@ export default class JsonApiProvider extends Api
 		await this._saveDatabase();
 	}
 
-	public async createTag(document: TagProperties): Promise<TagModel>
-	{
+	public async createTag(document: TagProperties): Promise<TagModel> {
 		const documentDB = this._createDocument(document);
 		const collection = this._getCollection(COLLECTION_TAGS);
 
@@ -127,31 +111,26 @@ export default class JsonApiProvider extends Api
 		return clone(documentDB) as TagModel;
 	}
 
-	public async getTags(): Promise<TagModel[]>
-	{
+	public async getTags(): Promise<TagModel[]> {
 		return clone(this._getCollection(COLLECTION_TAGS));
 	}
 
-	public async deleteTag(id: string): Promise<void>
-	{
+	public async deleteTag(id: string): Promise<void> {
 		const collection = this._getCollection<TagModel>(COLLECTION_TAGS);
 		const index = this._getIndexInCollectionByID(COLLECTION_TAGS, id);
 
-		if (index !== -1)
-		{
+		if (index !== -1) {
 			collection.splice(index, 1);
 			await this._saveDatabase();
 			return ;
 		}
 	}
 
-	public async updateTag(id: string, data: TagProperties): Promise<void>
-	{
+	public async updateTag(id: string, data: TagProperties): Promise<void> {
 		const collection = this._getCollection<TagModel>(COLLECTION_TAGS);
 		const index = this._getIndexInCollectionByID(COLLECTION_TAGS, id);
 		
-		if (index !== -1)
-		{
+		if (index !== -1) {
 			collection[index] = {...clone(data), id};
 			await this._saveDatabase();
 			return ;
@@ -160,8 +139,7 @@ export default class JsonApiProvider extends Api
 
 	// ---
 
-	public async createCategory(document: CategoryProperties): Promise<CategoryModel>
-	{
+	public async createCategory(document: CategoryProperties): Promise<CategoryModel> {
 		const documentDB = this._createDocument(document);
 		const collection = this._getCollection(COLLECTION_PROJECTS);
 
@@ -170,61 +148,51 @@ export default class JsonApiProvider extends Api
 		return clone(documentDB) as CategoryModel;
 	}
 
-	public async getCategories(): Promise<CategoryModel[]>
-	{
+	public async getCategories(): Promise<CategoryModel[]> {
 		return clone(this._getCollection(COLLECTION_PROJECTS));
 	}
 
-	public async deleteCategory(id: string): Promise<void>
-	{
+	public async deleteCategory(id: string): Promise<void> {
 		const collection = this._getCollection<CategoryModel>(COLLECTION_PROJECTS);
 		const index = this._getIndexInCollectionByID(COLLECTION_PROJECTS, id);
 
-		if (index !== -1)
-		{
+		if (index !== -1) {
 			collection.splice(index, 1);
 			await this._saveDatabase();
 			return ;
 		}
 	}
 
-	public async updateCategory(id: string, data: CategoryProperties): Promise<void>
-	{
+	public async updateCategory(id: string, data: CategoryProperties): Promise<void> {
 		const collection = this._getCollection<CategoryModel>(COLLECTION_PROJECTS);
 		const index = this._getIndexInCollectionByID(COLLECTION_PROJECTS, id);
 		
-		if (index !== -1)
-		{
+		if (index !== -1) {
 			collection[index] = {...clone(data), id};
 			await this._saveDatabase();
 			return ;
 		}
 	}
 
-	private _createDocument(originalDocument: any): any
-	{
+	private _createDocument(originalDocument: any): any {
 		return {...clone(originalDocument), id: Date.now()};
 	}
 
-	private _getCollection<T>(collectionName: string): T[]
-	{
+	private _getCollection<T>(collectionName: string): T[] {
 		const collection = this._collections[collectionName];
 		return collection as unknown as T[];
 	}
 
-	private _getIndexInCollectionByID(collectionName: string, id: string): number
-	{
+	private _getIndexInCollectionByID(collectionName: string, id: string): number {
 		const collection = this._getCollection(collectionName) as any;
-		for (let i = 0; i < collection.length; i++)
-		{
+		for (let i = 0; i < collection.length; i++) {
 			if (collection[i].id === id)
 				return i;
 		}
 		return -1;
 	}
 
-	private async _saveDatabase(): Promise<void>
-	{
+	private async _saveDatabase(): Promise<void> {
 		await this._writeDatabase(JSON.stringify(this._collections, null, 4));
 	}
 }

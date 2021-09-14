@@ -25,30 +25,26 @@ export interface ClientCache
 	categories: {[index: string]: Category}
 }
 
-export class SoftWikiClient
-{
+export class SoftWikiClient {
 	private _events: EventService
 	private _apiProvider: Api
 	
 	public cache: ClientCache = {notes: {}, tags: {}, categories: {}}
 
-	constructor(args: SoftWikiApiParameters)
-	{
+	constructor(args: SoftWikiApiParameters) {
 		this._apiProvider = args.provider;
 		this._events = new EventService();
 		
 		this._apiProvider.client = this;
 	}
 
-	public async init(): Promise<void>
-	{
+	public async init(): Promise<void> {
 		await this.fetchNotes();
 		await this.fetchTags();
 		await this.fetchCategories();
 	}
 
-	public async createNote(properties: NoteProperties): Promise<Note>
-	{
+	public async createNote(properties: NoteProperties): Promise<Note> {
 		const data = await this._apiProvider.createNote(properties);
 		const note = this._apiResponseToNote(data);
 		this._events.run(DataEvent.NotesUpdated); // [TODO] Probably removed in future
@@ -56,98 +52,81 @@ export class SoftWikiClient
 		return note;
 	}
 
-	public async fetchNotes(): Promise<Note[]>
-	{
+	public async fetchNotes(): Promise<Note[]> {
 		this.cache.notes = {};
 		const notesData = await this._apiProvider.getNotes();
-		const notes = notesData.map((note: NoteModel) =>
-		{
+		const notes = notesData.map((note: NoteModel) => {
 			return this._apiResponseToNote(note);
 		});
 		return notes;
 	}
 
-	public async createTag(properties: TagProperties): Promise<Tag>
-	{
+	public async createTag(properties: TagProperties): Promise<Tag> {
 		const data = await this._apiProvider.createTag(properties);
 		const tag = this._apiResponseToTag(data);
 		this._events.run(DataEvent.NotesUpdated);
 		return tag;
 	}
 
-	public async fetchTags(): Promise<Tag[]>
-	{
+	public async fetchTags(): Promise<Tag[]> {
 		this.cache.tags = {};
 		const tagsData = await this._apiProvider.getTags();
-		const tags = tagsData.map((tag: TagModel) =>
-		{
+		const tags = tagsData.map((tag: TagModel) => {
 			return this._apiResponseToTag(tag);
 		});
 		return tags;
 	}
 
-	public async createCategory(properties: CategoryProperties): Promise<Category>
-	{
+	public async createCategory(properties: CategoryProperties): Promise<Category> {
 		const data = await this._apiProvider.createCategory(properties);
 		const category = this._apiResponseToCategory(data);
 		this._events.run(DataEvent.CategoriesUpdated);
 		return category;
 	}
 
-	public async fetchCategories(): Promise<Category[]>
-	{
+	public async fetchCategories(): Promise<Category[]> {
 		const categoriesData = await this._apiProvider.getCategories();
-		const categories = categoriesData.map((projec: CategoryModel) =>
-		{
+		const categories = categoriesData.map((projec: CategoryModel) => {
 			return this._apiResponseToCategory(projec);
 		});
 		return categories;
 	}
 
-	public subscribe(name: string, id: string, handler: (args: unknown) => void): void
-	{
+	public subscribe(name: string, id: string, handler: (args: unknown) => void): void {
 		this._events.subscribe(name, id, handler);
 	}
 
-	public run(name: string, args: unknown = {}): void
-	{
+	public run(name: string, args: unknown = {}): void {
 		this._events.run(name, args);
 	}
 	
-	public getApi(): Api
-	{
+	public getApi(): Api {
 		return this._apiProvider;
 	}
 
-	get notes(): Note[]
-	{
+	get notes(): Note[] {
 		return Object.values(this.cache.notes);
 	}
 
-	get tags(): Tag[]
-	{
+	get tags(): Tag[] {
 		return Object.values(this.cache.tags);
 	}
 
-	get categories(): Category[]
-	{
+	get categories(): Category[] {
 		return Object.values(this.cache.categories);
 	}
 	
-	private _apiResponseToNote(data: NoteModel): Note
-	{
+	private _apiResponseToNote(data: NoteModel): Note {
 		this.cache.notes[data.id] = new Note(data, this);
 		return this.cache.notes[data.id];
 	}
 
-	private _apiResponseToTag(data: TagModel): Tag
-	{
+	private _apiResponseToTag(data: TagModel): Tag {
 		this.cache.tags[data.id] = new Tag(data, this);
 		return this.cache.tags[data.id];
 	}
 
-	private _apiResponseToCategory(data: CategoryModel): Category
-	{
+	private _apiResponseToCategory(data: CategoryModel): Category {
 		this.cache.categories[data.id] = new Category(data, this);
 		return this.cache.categories[data.id];
 	}
