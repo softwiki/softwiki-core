@@ -1,7 +1,7 @@
 import { Tag } from "./Tag";
 import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
 import { Category } from "./Category";
-import { NoteModel } from "../api-providers/Api";
+import { NoteModel } from "../data-providers/AbstractDataProvider";
 import { Base } from "./Base";
 
 export interface NoteProperties
@@ -10,13 +10,6 @@ export interface NoteProperties
 	content: string
 	tagsId: string[]
 	categoryId: string | undefined
-}
-
-export function isNoteModel(object: unknown): object is Note {
-	return "title" in (object as any)
-		&& "content" in (object as any)
-		&& "tagsId" in (object as any)
-		&& "categoryId" in (object as any);
 }
 
 export class Note extends Base {

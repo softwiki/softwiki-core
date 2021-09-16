@@ -1,4 +1,4 @@
-import Api, { NoteModel, CategoryModel, TagModel } from "../api-providers/Api";
+import AbstractDataProvider, { NoteModel, CategoryModel, TagModel } from "../data-providers/AbstractDataProvider";
 import { SoftWikiClient } from "..";
 import { Note } from "./Note";
 import { Category, Tag } from ".";
@@ -6,7 +6,7 @@ import { Category, Tag } from ".";
 export class Base {
 	protected _id: string
 	protected _client: SoftWikiClient
-	protected _api: Api
+	protected _api: AbstractDataProvider
 
 	constructor(id: string, client: SoftWikiClient) {
 		this._id = id;

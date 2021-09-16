@@ -1,5 +1,5 @@
 import SoftWikiClient from "../SoftWikiClient";
-import {TagProperties, NoteProperties, CategoryProperties} from "../objects";
+import {TagProperties, NoteProperties, CategoryProperties} from "../structures";
 
 export interface ModelBase
 {
@@ -12,7 +12,37 @@ export interface NoteModel extends ModelBase, NoteProperties {}
 export interface TagModel extends ModelBase, TagProperties {}
 export interface CategoryModel extends ModelBase, CategoryProperties {}
 
-export default abstract class Api {
+function hasBaseModelProperties(object: unknown): boolean
+{
+	return "id" in (object as any);
+		//&& "createdAt" in (object as any)
+		//&& "modifiedAt" in (object as any);
+}
+
+export function isNoteModel(object: unknown): object is NoteModel
+{
+	return hasBaseModelProperties(object)
+		&& "title" in (object as any)
+		&& "content" in (object as any)
+		&& "tagsId" in (object as any)
+		&& "categoryId" in (object as any);
+}
+
+export function isTagModel(object: unknown): object is TagModel
+{
+	return hasBaseModelProperties(object)
+		&& "name" in (object as any)
+		&& "color" in (object as any);
+}
+
+export function isCategorygModel(object: unknown): object is CategoryModel
+{
+	return hasBaseModelProperties(object)
+		&& "name" in (object as any);
+}
+
+export default abstract class AbstractDataProvider
+{
 	public abstract createNote(data: NoteProperties): Promise<NoteModel>
 	public abstract getNotes(): Promise<NoteModel[]>
 	public abstract deleteNote(id: string): Promise<void>

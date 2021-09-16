@@ -1,8 +1,8 @@
 /* eslint @typescript-eslint/no-unused-vars: off */
 
-import { TagProperties, NoteProperties } from "../objects";
-import Api, { NoteModel, CategoryModel, TagModel } from "./Api";
-import { CategoryProperties } from "../objects/Category";
+import { TagProperties, NoteProperties } from "../structures";
+import AbstractDataProvider, { NoteModel, CategoryModel, TagModel } from "./AbstractDataProvider";
+import { CategoryProperties } from "../structures/Category";
 
 export interface ICollections
 {
@@ -11,7 +11,7 @@ export interface ICollections
 	categories: CategoryModel[]
 }
 
-export default class FakeDataProvider extends Api {
+export default class FakeDataProvider extends AbstractDataProvider {
 	collections: ICollections = {notes: [], tags: [], categories: []}
 
 	nextId = 0;

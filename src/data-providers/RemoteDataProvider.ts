@@ -1,10 +1,10 @@
 /* eslint @typescript-eslint/naming-convention: off */
 
-import { TagProperties, NoteProperties } from "../objects";
-import Api, { NoteModel, CategoryModel, TagModel } from "./Api";
-import { CategoryProperties } from "../objects/Category";
+import { TagProperties, NoteProperties } from "../structures";
+import AbstractDataProvider, { NoteModel, CategoryModel, TagModel } from "./AbstractDataProvider";
+import { CategoryProperties } from "../structures/Category";
 
-export default class RemoteProvider extends Api {
+export default class RemoteDataProvider extends AbstractDataProvider {
 	private _url: string
 
 	constructor(url: string) {

@@ -1,7 +1,7 @@
-import { Note, Tag } from "./objects";
+import { Note, Tag } from "./structures";
 import { SoftWikiClient } from "./SoftWikiClient";
-import { Api } from "./api-providers";
-import MockedDataProvider, {ICollections} from "./api-providers/MockedProvider";
+import { Api } from "./data-providers";
+import MockedDataProvider, {ICollections} from "./data-providers/MockedProvider";
 
 describe("deprecated", () => {
 	test("deprecated", () => {});

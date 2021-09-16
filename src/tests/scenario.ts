@@ -1,5 +1,5 @@
-import { Api } from "../api-providers";
-import { CategoryModel, NoteModel, TagModel } from "../api-providers/Api";
+import { Api } from "../data-providers";
+import { CategoryModel, NoteModel, TagModel } from "../data-providers/AbstractDataProvider";
 import {UnknownIdError} from "../errors/ApiError";
 
 const FIRST_NOTE = 0;

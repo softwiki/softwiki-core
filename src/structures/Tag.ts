@@ -1,4 +1,4 @@
-import { TagModel } from "../api-providers/Api";
+import { TagModel } from "../data-providers/AbstractDataProvider";
 import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
 import { Base } from "./Base";
 
@@ -6,11 +6,6 @@ export interface TagProperties
 {
 	name: string
 	color: Color
-}
-
-export function isTagModel(object: unknown): object is Tag {
-	return "name" in (object as any)
-		&& "color" in (object as any);
 }
 
 export interface Color

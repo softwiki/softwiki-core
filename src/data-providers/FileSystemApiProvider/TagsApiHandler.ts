@@ -1,5 +1,5 @@
-import { Tag, TagProperties } from "../../objects";
-import { TagModel } from "../Api";
+import { Tag, TagProperties } from "../../structures";
+import { TagModel } from "../AbstractDataProvider";
 import ApiHandlerBase from "./ApiHandlerBase";
 import VirtualFileSystem from "./VirtualFileSystem";
 import FileSystemApiProvider, { FileSystemApiCache } from "./FileSystemApiProvider";

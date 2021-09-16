@@ -1,8 +1,8 @@
-import { isCategorygModel, isNoteModel, isTagModel, Note, NoteProperties } from "./objects";
-import { Tag, TagProperties } from "./objects";
-import { Category, CategoryProperties } from "./objects";
+import { Note, NoteProperties } from "./structures";
+import { Tag, TagProperties } from "./structures";
+import { Category, CategoryProperties } from "./structures";
 
-import Api, { NoteModel, CategoryModel, TagModel } from "./api-providers/Api";
+import AbstractDataProvider, { NoteModel, CategoryModel, TagModel, isCategorygModel, isNoteModel, isTagModel } from "./data-providers/AbstractDataProvider";
 import { EventService } from "./services";
 import { WrongDataStructure } from "./errors/ApiError";
 
@@ -16,7 +16,7 @@ export enum DataEvent
 
 interface SoftWikiApiParameters
 {
-	provider: Api
+	provider: AbstractDataProvider
 }
 
 export interface ClientCache
@@ -28,7 +28,7 @@ export interface ClientCache
 
 export class SoftWikiClient {
 	private _events: EventService
-	private _apiProvider: Api
+	private _apiProvider: AbstractDataProvider
 	
 	public cache: ClientCache = {notes: {}, tags: {}, categories: {}}
 
@@ -107,7 +107,7 @@ export class SoftWikiClient {
 		this._events.run(name, args);
 	}
 	
-	public getApi(): Api {
+	public getApi(): AbstractDataProvider {
 		return this._apiProvider;
 	}
 

@@ -1,6 +1,6 @@
 import { SoftWikiError } from "../../errors";
-import { CategoryProperties } from "../../objects";
-import { CategoryModel } from "../Api";
+import { CategoryProperties } from "../../structures";
+import { CategoryModel } from "../AbstractDataProvider";
 import ApiHandlerBase from "./ApiHandlerBase";
 import VirtualFileSystem from "./VirtualFileSystem";
 import FileSystemApiProvider, { FileSystemApiCache } from "./FileSystemApiProvider";

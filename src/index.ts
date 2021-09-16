@@ -1,2 +1,2 @@
 export * from "./SoftWikiClient";
-export * from "./api-providers";
+export * from "./data-providers";

@@ -1,5 +1,5 @@
-import { NoteProperties, TagProperties, CategoryProperties } from "../../objects";
-import Api, {NoteModel, CategoryModel, TagModel} from "../Api";
+import { NoteProperties, TagProperties, CategoryProperties } from "../../structures";
+import AbstractDataProvider, {NoteModel, CategoryModel, TagModel} from "../AbstractDataProvider";
 import VirtualFileSystem from "./VirtualFileSystem";
 import CategoriesApiHandler from "./CategoriesApiHandler";
 import NotesApiHandler from "./NotesApiHandler";
@@ -14,7 +14,7 @@ export interface FileSystemApiCache
 	notesIdByTagId: {[tagId: string]: string[]}
 }
 
-export default class FileSystemApiProvider extends Api {
+export default class FileSystemApiProvider extends AbstractDataProvider {
 	private _basePath: string
 	private _fs: any	
 	private _cache: FileSystemApiCache

@@ -1,6 +1,6 @@
-import { NoteProperties, CategoryProperties, TagProperties } from "../objects";
+import { NoteProperties, CategoryProperties, TagProperties } from "../structures";
 import { Api } from ".";
-import { NoteModel, CategoryModel, TagModel } from "./Api";
+import { NoteModel, CategoryModel, TagModel } from "./AbstractDataProvider";
 
 interface ICollections
 {

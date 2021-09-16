@@ -1,8 +1,8 @@
 /* eslint @typescript-eslint/no-unused-vars: off */
 
-import { TagProperties, NoteProperties } from "../objects";
-import Api, { NoteModel, CategoryModel, TagModel } from "./Api";
-import { CategoryProperties } from "../objects/Category";
+import { TagProperties, NoteProperties } from "../structures";
+import AbstractDataProvider, { NoteModel, CategoryModel, TagModel } from "./AbstractDataProvider";
+import { CategoryProperties } from "../structures/Category";
 import sqlite, { RunResult } from "sqlite3";
 import { UnknownIdError } from "../errors/ApiError";
 
@@ -11,7 +11,7 @@ const TABLE_TAGS = "tags";
 const TABLE_CATEGORIES = "categories";
 const TABLE_LINK_NOTES_TAGS = "link_notes_tags";
 
-export default class SQLiteProvider extends Api {
+export default class SQLiteDataProvider extends AbstractDataProvider {
 	private _filename: string
 	private _db: sqlite.Database
 
@@ -21,8 +21,8 @@ export default class SQLiteProvider extends Api {
 		this._db = new sqlite.Database(this._filename);
 	}
 
-	public static async create(filename: string): Promise<SQLiteProvider> {
-		const db = new SQLiteProvider(filename);
+	public static async create(filename: string): Promise<SQLiteDataProvider> {
+		const db = new SQLiteDataProvider(filename);
 		await db.setup();
 		return db;
 	}

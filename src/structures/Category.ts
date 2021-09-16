@@ -1,15 +1,11 @@
 import { DataEvent, SoftWikiClient } from "../SoftWikiClient";
-import { CategoryModel } from "../api-providers/Api";
+import { CategoryModel } from "../data-providers/AbstractDataProvider";
 import { Note } from "./Note";
 import { Base } from "./Base";
 
 export interface CategoryProperties
 {
 	name: string
-}
-
-export function isCategorygModel(object: unknown): object is Category {
-	return "name" in (object as any);
 }
 
 export class Category extends Base {
